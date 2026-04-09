@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>User Manual — AI Accounting Migration System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  /* ── RESET & BASE ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #1a1a2e;
+    background: #fff;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+    body { font-size: 11.5px; }
+    .page-break { page-break-before: always; }
+    .cover { page-break-after: always; }
+    section { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: rgba(99,102,241,0.08);
+    top: -200px; right: -200px;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(139,92,246,0.06);
+    bottom: -100px; left: -100px;
+  }
+  .cover-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #818cf8;
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.3);
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-title {
+    font-size: 42px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-title span { color: #818cf8; }
+  .cover-sub {
+    font-size: 16px;
+    color: #9ca3af;
+    font-weight: 300;
+    margin-bottom: 48px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(to right, #6366f1, #8b5cf6);
+    margin: 0 auto 48px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta-item { text-align: center; }
+  .cover-meta-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4b5563;
+    margin-bottom: 4px;
+  }
+  .cover-meta-value {
+    font-size: 13px;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .cover-footer {
+    position: absolute;
+    bottom: 32px;
+    font-size: 11px;
+    color: #374151;
+    letter-spacing: 0.05em;
+    z-index: 1;
+  }
+
+  /* ── CONTENT WRAPPER ── */
+  .content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: #f8f9ff;
+    border: 1px solid #e0e4ff;
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-bottom: 56px;
+  }
+  .toc-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #6366f1;
+    margin-bottom: 20px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #e0e4ff;
+    font-size: 12.5px;
+    color: #374151;
+  }
+  .toc-list li:last-child { border-bottom: none; }
+  .toc-list .toc-num {
+    font-weight: 700;
+    color: #6366f1;
+    margin-right: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .toc-list .toc-dots {
+    flex: 1;
+    border-bottom: 1px dashed #c7d2fe;
+    margin: 0 10px;
+    height: 12px;
+  }
+  .toc-list .toc-page {
+    font-size: 11px;
+    color: #9ca3af;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── SECTION ── */
+  .section-num {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6366f1;
+    background: #eef2ff;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+  .section-intro {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 28px 0 12px;
+  }
+  h4 {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #374151;
+    margin: 18px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  p { margin-bottom: 12px; color: #374151; }
+
+  /* ── STEP CARDS ── */
+  .steps { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+  .step {
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .step-num {
+    min-width: 32px; height: 32px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body {}
+  .step-title { font-size: 13.5px; font-weight: 600; color: #1f2937; margin-bottom: 5px; }
+  .step-desc { font-size: 12.5px; color: #6b7280; line-height: 1.6; }
+
+  /* ── INFO / WARNING / TIP BOXES ── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 12.5px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { flex: 1; line-height: 1.6; }
+  .callout-body strong { display: block; margin-bottom: 3px; font-size: 12px; letter-spacing: 0.04em; }
+  .callout-info    { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+  .callout-warning { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+  .callout-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #14532d; }
+  .callout-error   { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 12px;
+  }
+  th {
+    background: #f1f5f9;
+    font-weight: 600;
+    text-align: left;
+    padding: 9px 12px;
+    color: #374151;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid #e2e8f0;
+  }
+  td {
+    padding: 9px 12px;
+    border: 1px solid #f1f5f9;
+    color: #4b5563;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafbff; }
+
+  /* ── CODE ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    background: #f1f5f9;
+    color: #6366f1;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+  pre .c { color: #6c7086; }
+  pre .k { color: #89b4fa; }
+  pre .s { color: #a6e3a1; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    vertical-align: middle;
+  }
+  .badge-green  { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+  .badge-red    { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .badge-blue   { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+  .badge-purple { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+
+  /* ── SCREEN MOCKUP ── */
+  .screen {
+    background: #0b0b12;
+    border-radius: 12px;
+    border: 1px solid #1e1e2e;
+    overflow: hidden;
+    margin: 20px 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  }
+  .screen-bar {
+    background: #13131f;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #1e1e2e;
+  }
+  .screen-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .screen-title {
+    font-size: 11px;
+    color: #4b5563;
+    font-family: 'JetBrains Mono', monospace;
+    margin-left: 8px;
+    flex: 1;
+    text-align: center;
+  }
+  .screen-body { padding: 20px 22px; }
+  .ui-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    font-size: 12px;
+  }
+  .ui-row.active { background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); }
+  .ui-dot { width: 7px; height: 7px; border-radius: 50%; background: #2a2a38; flex-shrink: 0; }
+  .ui-dot.green { background: #4ade80; box-shadow: 0 0 4px #4ade80; }
+  .ui-dot.yellow { background: #fbbf24; box-shadow: 0 0 4px #fbbf24; }
+  .ui-text { color: #9ca3af; }
+  .ui-text.bright { color: #4ade80; }
+
+  /* ── PIPELINE DIAGRAM ── */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .pipe-step {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+  .pipe-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+    flex-shrink: 0;
+  }
+  .pipe-circle {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .pipe-line {
+    width: 2px;
+    flex: 1;
+    background: #e5e7eb;
+    margin: 2px auto;
+    min-height: 20px;
+  }
+  .pipe-card {
+    flex: 1;
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    margin-left: 12px;
+  }
+  .pipe-card-title { font-size: 13px; font-weight: 600; color: #1f2937; margin-bottom: 3px; }
+  .pipe-card-desc  { font-size: 11.5px; color: #9ca3af; }
+
+  /* ── SECTION SEPARATOR ── */
+  .sep {
+    border: none;
+    border-top: 1px solid #f3f4f6;
+    margin: 48px 0;
+  }
+  .page-break { margin-top: 48px; }
+
+  /* ── ENTITY LIST ── */
+  .entity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .entity-item {
+    background: #f8f9ff;
+    border: 1px solid #e0e4ff;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .entity-item .ei-icon { font-size: 14px; }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #9ca3af;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">User Manual · v1.0</div>
+  <div class="cover-title">AI Accounting<br><span>Migration System</span></div>
+  <div class="cover-sub">Reckon Desktop &nbsp;→&nbsp; Reckon One</div>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Prepared for</div>
+      <div class="cover-meta-value">Client</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Version</div>
+      <div class="cover-meta-value">1.0.0</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Date</div>
+      <div class="cover-meta-value">April 2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="cover-meta-label">Document type</div>
+      <div class="cover-meta-value">User Manual</div>
+    </div>
+  </div>
+  <div class="cover-footer">Confidential — For authorised users only</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     CONTENT
+══════════════════════════════════════════════ -->
+<div class="content">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <div class="toc-title">Table of Contents</div>
+    <ul class="toc-list">
+      <li><span><span class="toc-num">01</span> System Overview</span><span class="toc-dots"></span><span class="toc-page">2</span></li>
+      <li><span><span class="toc-num">02</span> Getting Started — Accessing the App</span><span class="toc-dots"></span><span class="toc-page">3</span></li>
+      <li><span><span class="toc-num">03</span> Sidebar — Navigation & Settings</span><span class="toc-dots"></span><span class="toc-page">3</span></li>
+      <li><span><span class="toc-num">04</span> Run Pipeline — Step-by-Step Guide</span><span class="toc-dots"></span><span class="toc-page">4</span></li>
+      <li><span><span class="toc-num">05</span> Entity Transform — Rules Engine</span><span class="toc-dots"></span><span class="toc-page">6</span></li>
+      <li><span><span class="toc-num">06</span> Results — Reading the Output</span><span class="toc-dots"></span><span class="toc-page">8</span></li>
+      <li><span><span class="toc-num">07</span> HITL Review — Human Approval</span><span class="toc-dots"></span><span class="toc-page">9</span></li>
+      <li><span><span class="toc-num">08</span> Memory & AutoLearn</span><span class="toc-dots"></span><span class="toc-page">10</span></li>
+      <li><span><span class="toc-num">09</span> Audit Log</span><span class="toc-dots"></span><span class="toc-page">10</span></li>
+      <li><span><span class="toc-num">10</span> CSV Format Reference</span><span class="toc-dots"></span><span class="toc-page">11</span></li>
+      <li><span><span class="toc-num">11</span> Status Badges Explained</span><span class="toc-dots"></span><span class="toc-page">12</span></li>
+      <li><span><span class="toc-num">12</span> Troubleshooting</span><span class="toc-dots"></span><span class="toc-page">12</span></li>
+    </ul>
+  </div>
+
+
+  <!-- ══ SECTION 1: OVERVIEW ══ -->
+  <div class="section-num">Section 01</div>
+  <h2>System Overview</h2>
+  <p class="section-intro">
+    The AI Accounting Migration System automates the migration of your financial data from <strong>Reckon Desktop</strong> to <strong>Reckon One</strong>. It combines deterministic rules (built from the official Reckon mapping specification) with AI inference to map accounts, detect anomalies, and reconcile trial balances — with human oversight at every uncertain step.
+  </p>
+
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-circle" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">1</div>
+        <div class="pipe-line"></div>
+      </div>
+      <div class="pipe-card">
+        <div class="pipe-card-title">Upload your Reckon Desktop data</div>
+        <div class="pipe-card-desc">Chart of Accounts, Journal Entries, Trial Balance — as CSV files</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-circle" style="background:linear-gradient(135deg,#10b981,#059669);">2</div>
+        <div class="pipe-line"></div>
+      </div>
+      <div class="pipe-card">
+        <div class="pipe-card-title">Rules Engine applies deterministic transforms</div>
+        <div class="pipe-card-desc">27 COA type mappings, 19 tax codes, code cleanup, mandatory accounts — no AI cost</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-circle" style="background:linear-gradient(135deg,#f59e0b,#d97706);">3</div>
+        <div class="pipe-line"></div>
+      </div>
+      <div class="pipe-card">
+        <div class="pipe-card-title">AI maps ambiguous accounts</div>
+        <div class="pipe-card-desc">Dual-model LLM inference for accounts the rules alone cannot resolve</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-circle" style="background:linear-gradient(135deg,#ef4444,#dc2626);">4</div>
+        <div class="pipe-line"></div>
+      </div>
+      <div class="pipe-card">
+        <div class="pipe-card-title">Human reviews uncertain mappings (HITL)</div>
+        <div class="pipe-card-desc">Low-confidence items surfaced for accountant approval before proceeding</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-circle" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);">5</div>
+        <div class="pipe-line"></div>
+      </div>
+      <div class="pipe-card">
+        <div class="pipe-card-title">Anomaly detection on journal entries</div>
+        <div class="pipe-card-desc">Scans for 10+ Reckon-specific issues: duplicate refs, GST errors, cutoff violations</div>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-left">
+        <div class="pipe-circle" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">6</div>
+        <div class="pipe-line"></div>
+      </div>
+      <div class="pipe-card" style="margin-bottom:0;">
+        <div class="pipe-card-title">Trial balance reconciliation + final report</div>
+        <div class="pipe-card-desc">CFO-level variance analysis with PASSED / REVIEW / FAILED status and next steps</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-success">
+    <span class="callout-icon">✓</span>
+    <div class="callout-body">
+      <strong>Key benefit</strong>
+      The system gets smarter with every run. Approved mappings are saved to memory — the next migration of a similar client will resolve most accounts automatically, with no AI calls needed.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 2: GETTING STARTED ══ -->
+  <div class="section-num">Section 02</div>
+  <h2>Getting Started — Accessing the App</h2>
+  <p class="section-intro">The application runs in your web browser. No installation is required.</p>
+
+  <h3>Open the application</h3>
+  <p>Navigate to the deployed URL in any modern browser (Chrome, Edge, Firefox):</p>
+  <pre>https://your-app.streamlit.app</pre>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ</span>
+    <div class="callout-body">
+      <strong>First load</strong>
+      The app may take 10–20 seconds to load on the first visit as the server wakes up. Subsequent pages load instantly.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 3: SIDEBAR ══ -->
+  <div class="section-num">Section 03</div>
+  <h2>Sidebar — Navigation & Settings</h2>
+  <p class="section-intro">The left sidebar is visible on every page and contains pipeline configuration and navigation.</p>
+
+  <div class="screen">
+    <div class="screen-bar">
+      <div class="screen-dot" style="background:#ff5f57;"></div>
+      <div class="screen-dot" style="background:#febc2e;"></div>
+      <div class="screen-dot" style="background:#28c840;"></div>
+      <div class="screen-title">AI Migration System · Sidebar</div>
+    </div>
+    <div class="screen-body">
+      <div style="font-size:11px;color:#6366f1;font-weight:700;margin-bottom:14px;letter-spacing:0.1em;">🏦 MIGRATION SYSTEM</div>
+      <div style="font-size:10px;color:#4b5563;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;">Pipeline settings</div>
+      <div style="background:#13131f;border-radius:6px;padding:10px 12px;margin-bottom:8px;">
+        <div style="font-size:10px;color:#6b7280;margin-bottom:4px;">HITL threshold: <span style="color:#fbbf24;">70%</span></div>
+        <div style="height:4px;background:#1e1e2e;border-radius:2px;"><div style="width:70%;height:100%;background:linear-gradient(to right,#6366f1,#8b5cf6);border-radius:2px;"></div></div>
+      </div>
+      <div style="background:#13131f;border-radius:6px;padding:10px 12px;margin-bottom:8px;">
+        <div style="font-size:10px;color:#6b7280;margin-bottom:4px;">Auto-approve threshold: <span style="color:#4ade80;">85%</span></div>
+        <div style="height:4px;background:#1e1e2e;border-radius:2px;"><div style="width:85%;height:100%;background:linear-gradient(to right,#10b981,#059669);border-radius:2px;"></div></div>
+      </div>
+      <div style="font-size:10px;color:#4b5563;margin:14px 0 8px;text-transform:uppercase;letter-spacing:0.1em;">Navigation</div>
+      <div class="ui-row active"><div class="ui-dot green"></div><div class="ui-text bright">🚀 Run pipeline</div></div>
+      <div class="ui-row"><div class="ui-dot"></div><div class="ui-text">🔄 Entity Transform</div></div>
+      <div class="ui-row"><div class="ui-dot"></div><div class="ui-text">📊 Results</div></div>
+      <div class="ui-row"><div class="ui-dot"></div><div class="ui-text">👤 HITL Review</div></div>
+      <div class="ui-row"><div class="ui-dot"></div><div class="ui-text">🧠 Memory & AutoLearn</div></div>
+      <div class="ui-row"><div class="ui-dot"></div><div class="ui-text">📜 Audit log</div></div>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Setting</th><th>Default</th><th>What it controls</th></tr>
+    <tr><td><strong>HITL threshold %</strong></td><td>70%</td><td>Mappings below this confidence go to human review queue</td></tr>
+    <tr><td><strong>Auto-approve threshold %</strong></td><td>85%</td><td>Mappings above this (and both models agree) are auto-approved</td></tr>
+    <tr><td><strong>Cutoff date</strong></td><td>2024-03-31</td><td>Journal entries before this = historical; after = YTD (affects anomaly detection)</td></tr>
+  </table>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 4: RUN PIPELINE ══ -->
+  <div class="section-num">Section 04</div>
+  <h2>Run Pipeline — Step-by-Step Guide</h2>
+  <p class="section-intro">This is the main page where you upload data and run the full migration pipeline. Click <strong>"🚀 Run pipeline"</strong> in the sidebar.</p>
+
+  <h3>Step 1 — Choose upload mode</h3>
+  <p>Two upload modes are available:</p>
+
+  <table>
+    <tr><th>Mode</th><th>When to use</th><th>What to upload</th></tr>
+    <tr>
+      <td><strong>Single file (ALL DATA CSV)</strong></td>
+      <td>You have the full Reckon Desktop export in one CSV</td>
+      <td>One CSV file containing all transaction types</td>
+    </tr>
+    <tr>
+      <td><strong>Multiple files</strong></td>
+      <td>You have separate files for accounts, journals, TB</td>
+      <td>3 separate CSV files: Source accounts, Journal entries, Trial balance</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ</span>
+    <div class="callout-body">
+      <strong>No file? Use sample data</strong>
+      If you do not upload any file, the system will run with built-in sample Reckon Desktop data. This is useful for testing and demonstrations.
+    </div>
+  </div>
+
+  <h3>Step 2 — Upload your file(s)</h3>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">A</div>
+      <div class="step-body">
+        <div class="step-title">Single file mode — Upload ALL DATA CSV</div>
+        <div class="step-desc">Click "Browse files" and select your Reckon Desktop export CSV. The system automatically detects unique accounts, General Journal entries, and calculates trial balance. You will see a preview of accounts, journals, and TB after upload.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">B</div>
+      <div class="step-body">
+        <div class="step-title">Multiple file mode — Use the three tabs</div>
+        <div class="step-desc"><strong>Tab 1 — Source accounts:</strong> Upload Chart of Accounts CSV (columns: name, type, code)<br><strong>Tab 2 — Journal entries:</strong> Upload journals CSV (columns: ref, date, desc, amount, type)<br><strong>Tab 3 — Trial balance:</strong> Displays default TB; upload custom if available</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">C</div>
+      <div class="step-body">
+        <div class="step-title">Upload Target accounts (optional)</div>
+        <div class="step-desc">You may also upload a Reckon One target accounts CSV. If not uploaded, the system uses default Reckon One account structure automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Step 3 — Run the pipeline</h3>
+  <p>Click the <strong>"▶ Run pipeline"</strong> button. The pipeline runs in three stages:</p>
+
+  <table>
+    <tr><th>Stage</th><th>What happens</th><th>Time</th></tr>
+    <tr><td>Mapping agent</td><td>Maps all source accounts to Reckon One targets using rules + AI</td><td>10–30 sec</td></tr>
+    <tr><td>Anomaly agent</td><td>Scans journal entries for Reckon-specific issues</td><td>5–15 sec</td></tr>
+    <tr><td>Reconcile agent</td><td>Compares source vs migrated trial balance; generates CFO memo</td><td>5–10 sec</td></tr>
+  </table>
+
+  <p>A live progress bar and log console show each step as it completes.</p>
+
+  <h3>Step 4 — Review the summary</h3>
+  <p>After the pipeline completes, a summary appears showing:</p>
+  <ul style="padding-left:20px;color:#374151;font-size:12.5px;line-height:2;">
+    <li>Total accounts processed</li>
+    <li>Number <span class="badge badge-green">APPROVED</span> — ready for import</li>
+    <li>Number <span class="badge badge-yellow">REVIEW</span> — need attention</li>
+    <li>Number <span class="badge badge-red">ERROR</span> — could not be mapped</li>
+    <li>Count of anomalies detected</li>
+  </ul>
+
+  <div class="callout callout-warning">
+    <span class="callout-icon">⚠</span>
+    <div class="callout-body">
+      <strong>HITL alert</strong>
+      If the system finds accounts it is not confident about, a warning message will appear: <em>"X accounts need human review → go to HITL Review tab"</em>. Review these before proceeding to import.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 5: ENTITY TRANSFORM ══ -->
+  <div class="page-break"></div>
+  <div class="section-num">Section 05</div>
+  <h2>Entity Transform — Rules Engine</h2>
+  <p class="section-intro">Click <strong>"🔄 Entity Transform"</strong> in the sidebar. This page lets you transform individual entity types using the deterministic Reckon rules — without running the full pipeline. Useful for checking specific data types before full migration.</p>
+
+  <h3>Supported entity types (29 total)</h3>
+
+  <h4>Master Data</h4>
+  <div class="entity-grid">
+    <div class="entity-item"><span class="ei-icon">📋</span> COA (Chart of Accounts)</div>
+    <div class="entity-item"><span class="ei-icon">🏦</span> Bank Accounts</div>
+    <div class="entity-item"><span class="ei-icon">🏷</span> Tax Codes</div>
+    <div class="entity-item"><span class="ei-icon">📅</span> Terms (Payment Terms)</div>
+    <div class="entity-item"><span class="ei-icon">👤</span> Customer</div>
+    <div class="entity-item"><span class="ei-icon">🏭</span> Supplier</div>
+    <div class="entity-item"><span class="ei-icon">📦</span> Item</div>
+    <div class="entity-item"><span class="ei-icon">📁</span> Project (Customer Job)</div>
+    <div class="entity-item"><span class="ei-icon">🗂</span> Class</div>
+  </div>
+
+  <h4>Transactions</h4>
+  <div class="entity-grid">
+    <div class="entity-item"><span class="ei-icon">🧾</span> Invoice / Tax Invoice</div>
+    <div class="entity-item"><span class="ei-icon">📄</span> Credit Memo</div>
+    <div class="entity-item"><span class="ei-icon">📜</span> Bill</div>
+    <div class="entity-item"><span class="ei-icon">📑</span> Bill Credit</div>
+    <div class="entity-item"><span class="ei-icon">💳</span> Cheque / CC Charge</div>
+    <div class="entity-item"><span class="ei-icon">💰</span> Deposit / Receive Money</div>
+    <div class="entity-item"><span class="ei-icon">🔄</span> Transfer</div>
+    <div class="entity-item"><span class="ei-icon">📝</span> Journal Entry</div>
+    <div class="entity-item"><span class="ei-icon">💵</span> Sales Receipt</div>
+    <div class="entity-item"><span class="ei-icon">💸</span> Payment / Bill Payment</div>
+  </div>
+
+  <h4>Journal-Based Conversions (Reckon One does not have these types natively)</h4>
+  <div class="entity-grid">
+    <div class="entity-item"><span class="ei-icon">→</span> Paycheque → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> Item Receipt → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> Inventory Adjustment → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> Liability Cheque → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> YTD Adjustment → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> C Card Refund → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> Statement Charge → Journal</div>
+    <div class="entity-item"><span class="ei-icon">→</span> Build Assembly → Journal</div>
+  </div>
+
+  <h3>How to use Entity Transform</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Select entity type</div>
+        <div class="step-desc">Choose from the dropdown (e.g. "COA (Chart of Accounts)"). A hint box will appear showing the expected CSV column names.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Upload CSV or use sample data</div>
+        <div class="step-desc">Upload your Reckon Desktop export for that entity type. If you skip upload, sample data is used for preview.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Click "▶ Apply Reckon Rules"</div>
+        <div class="step-desc">The rules engine transforms every record instantly. Metrics show: records processed, total rules applied, average rules per record.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Review results in three tabs</div>
+        <div class="step-desc">
+          <strong>Transformed data</strong> — clean Reckon One format, ready to download as CSV<br>
+          <strong>Rules applied</strong> — per-record log of every rule that fired<br>
+          <strong>Type mappings reference</strong> — full COA / tax code mapping table
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Download the transformed CSV</div>
+        <div class="step-desc">Click "⬇ Download [Entity] CSV (Reckon One format)" to save the output file, ready for import into Reckon One.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-success">
+    <span class="callout-icon">✓</span>
+    <div class="callout-body">
+      <strong>COA pre-flight validation</strong>
+      For Chart of Accounts, the system also runs automatic validation checks after transformation. Any errors or warnings (e.g. missing mandatory fields, invalid account codes) are displayed before you download.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 6: RESULTS ══ -->
+  <div class="section-num">Section 06</div>
+  <h2>Results — Reading the Output</h2>
+  <p class="section-intro">Click <strong>"📊 Results"</strong> in the sidebar after running the pipeline. Results are organised in three tabs.</p>
+
+  <h3>Tab 1 — Account Mappings</h3>
+  <p>Shows a table of every source account and its mapped Reckon One target:</p>
+
+  <table>
+    <tr><th>Column</th><th>Meaning</th></tr>
+    <tr><td>Source</td><td>Reckon Desktop account code</td></tr>
+    <tr><td>Source name</td><td>Original account name</td></tr>
+    <tr><td>Target</td><td>Mapped Reckon One account code</td></tr>
+    <tr><td>Target name</td><td>Reckon One account name</td></tr>
+    <tr><td>Confidence</td><td>AI confidence score (0–100%)</td></tr>
+    <tr><td>Status</td><td><span class="badge badge-green">APPROVED</span> <span class="badge badge-yellow">REVIEW</span> <span class="badge badge-red">ERROR</span></td></tr>
+    <tr><td>Source</td><td>How it was resolved: <code>rules</code> / <code>memory</code> / <code>llm</code></td></tr>
+  </table>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ</span>
+    <div class="callout-body">
+      <strong>Download mappings</strong>
+      A "⬇ Download CSV" button at the bottom of the mappings table lets you export the full mapping results for your records.
+    </div>
+  </div>
+
+  <h3>Tab 2 — Anomalies</h3>
+  <p>Each detected anomaly shows:</p>
+  <ul style="padding-left:20px;color:#374151;font-size:12.5px;line-height:2;">
+    <li><strong>Reference</strong> — journal entry ref number</li>
+    <li><strong>Issue type</strong> — e.g. Duplicate_ref, GST_rounding, Invoice_over_75_lines</li>
+    <li><strong>Severity</strong> — <span class="badge badge-red">HIGH</span> <span class="badge badge-yellow">MEDIUM</span> <span class="badge badge-blue">LOW</span></li>
+    <li><strong>Finding</strong> — description of the problem</li>
+    <li><strong>Recommended action</strong> — what to do to fix it before import</li>
+  </ul>
+
+  <h3>Tab 3 — Reconciliation</h3>
+  <p>The reconciliation result appears as a banner:</p>
+  <table>
+    <tr><th>Status</th><th>Meaning</th><th>Action</th></tr>
+    <tr><td><span class="badge badge-green">PASSED</span></td><td>Source TB matches migrated TB within tolerance</td><td>Proceed to import</td></tr>
+    <tr><td><span class="badge badge-yellow">REVIEW</span></td><td>Minor variances detected — investigate root cause</td><td>Review next steps list</td></tr>
+    <tr><td><span class="badge badge-red">FAILED</span></td><td>Significant discrepancies in trial balance</td><td>Fix variances before import</td></tr>
+  </table>
+  <p>Below the banner: account-by-account variance table, AI-generated CFO memo explaining root causes, and a numbered next steps checklist.</p>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 7: HITL ══ -->
+  <div class="page-break"></div>
+  <div class="section-num">Section 07</div>
+  <h2>HITL Review — Human Approval</h2>
+  <p class="section-intro">Click <strong>"👤 HITL Review"</strong> in the sidebar. This page shows accounts the AI was not confident about — requiring a human accountant to review and approve before the migration proceeds.</p>
+
+  <h3>When does an account go to HITL?</h3>
+  <ul style="padding-left:20px;color:#374151;font-size:12.5px;line-height:2;">
+    <li>AI confidence score is below the HITL threshold (default 70%)</li>
+    <li>Primary and validator models disagree on the target account</li>
+    <li>No matching rule or memory entry exists for this account type</li>
+  </ul>
+
+  <h3>How to review HITL items</h3>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Read the AI suggestion</div>
+        <div class="step-desc">Each card shows: source account details, AI-suggested target, confidence score, and the AI's reasoning.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Approve or override</div>
+        <div class="step-desc">If the AI suggestion is correct — click <strong>"Approve"</strong>. If wrong — select the correct target account from the dropdown and click <strong>"Override"</strong>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Decision is saved to memory</div>
+        <div class="step-desc">Your decision is immediately saved. The next time a similar account is encountered (same name/type), it will be resolved automatically — no human review needed again.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-warning">
+    <span class="callout-icon">⚠</span>
+    <div class="callout-body">
+      <strong>Important</strong>
+      Do not skip HITL review. Accounts left unreviewed will remain in <span class="badge badge-yellow">REVIEW</span> status and should not be imported to Reckon One until resolved.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 8: MEMORY ══ -->
+  <div class="section-num">Section 08</div>
+  <h2>Memory & AutoLearn</h2>
+  <p class="section-intro">Click <strong>"🧠 Memory & AutoLearn"</strong> in the sidebar. This page shows the system's accumulated knowledge from all past migration runs.</p>
+
+  <table>
+    <tr><th>Metric</th><th>What it means</th></tr>
+    <tr><td>Total mappings stored</td><td>Number of account mappings in the memory database</td></tr>
+    <tr><td>Human-approved</td><td>Mappings that a human explicitly approved via HITL</td></tr>
+    <tr><td>Auto-approved</td><td>High-confidence AI mappings stored automatically</td></tr>
+    <tr><td>Patterns learned</td><td>Anomaly patterns extracted from past runs</td></tr>
+    <tr><td>RAG entries</td><td>Semantic memory entries used for AI context</td></tr>
+  </table>
+
+  <p>This page also shows run history: each migration run with its date, account counts, anomaly count, and reconciliation status.</p>
+
+  <div class="callout callout-success">
+    <span class="callout-icon">✓</span>
+    <div class="callout-body">
+      <strong>AutoLearn benefit</strong>
+      After 2–3 migration runs on similar clients, the memory store typically resolves 80%+ of accounts via rules + memory, with very few accounts needing AI or human review.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 9: AUDIT LOG ══ -->
+  <div class="section-num">Section 09</div>
+  <h2>Audit Log</h2>
+  <p class="section-intro">Click <strong>"📜 Audit log"</strong> in the sidebar. Every AI decision made during the pipeline is recorded here.</p>
+
+  <p>Each log entry shows:</p>
+  <ul style="padding-left:20px;color:#374151;font-size:12.5px;line-height:2;">
+    <li><strong>Timestamp</strong> — when the decision was made</li>
+    <li><strong>Agent</strong> — which agent made the decision (mapping / anomaly / reconcile)</li>
+    <li><strong>Input</strong> — the account or entry that was processed</li>
+    <li><strong>Output</strong> — the AI's decision with confidence and reasoning</li>
+  </ul>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ</span>
+    <div class="callout-body">
+      <strong>Compliance use</strong>
+      The audit log provides a complete trail of every AI decision for compliance and review purposes. It can be exported as JSONL for external audit tools.
+    </div>
+  </div>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 10: CSV FORMAT REFERENCE ══ -->
+  <div class="page-break"></div>
+  <div class="section-num">Section 10</div>
+  <h2>CSV Format Reference</h2>
+  <p class="section-intro">Use these column names when preparing your Reckon Desktop CSV exports for upload.</p>
+
+  <h3>Source Accounts (Chart of Accounts)</h3>
+  <table>
+    <tr><th>Column name</th><th>Required</th><th>Example</th></tr>
+    <tr><td><code>Account</code> or <code>name</code></td><td>Yes</td><td>ANZ Business Cheque</td></tr>
+    <tr><td><code>Account Type</code> or <code>type</code></td><td>Yes</td><td>Bank</td></tr>
+    <tr><td><code>Accnt. #</code> or <code>code</code></td><td>Yes</td><td>1-1000</td></tr>
+    <tr><td><code>Description</code></td><td>No</td><td>Main operating account</td></tr>
+    <tr><td><code>Tax Code</code></td><td>No</td><td>GST</td></tr>
+    <tr><td><code>Active Status</code></td><td>No</td><td>Active / Inactive</td></tr>
+  </table>
+
+  <h3>Journal Entries</h3>
+  <table>
+    <tr><th>Column name</th><th>Required</th><th>Example</th></tr>
+    <tr><td><code>ref</code> or <code>Num</code></td><td>Yes</td><td>JE-001</td></tr>
+    <tr><td><code>date</code> or <code>Date</code></td><td>Yes</td><td>2024-03-31</td></tr>
+    <tr><td><code>desc</code> or <code>Description</code></td><td>Yes</td><td>Opening balance transfer</td></tr>
+    <tr><td><code>amount</code> or <code>Debit</code> / <code>Credit</code></td><td>Yes</td><td>48235000</td></tr>
+    <tr><td><code>type</code> or <code>Type</code></td><td>No</td><td>OB / Accrual / Revenue</td></tr>
+  </table>
+
+  <h3>Customer CSV</h3>
+  <table>
+    <tr><th>Column name</th><th>Required</th><th>Notes</th></tr>
+    <tr><td><code>Customer Name</code></td><td>Yes</td><td>Special chars stripped automatically</td></tr>
+    <tr><td><code>Company Name</code></td><td>No</td><td></td></tr>
+    <tr><td><code>Line 1/Street1</code>, <code>City</code>, <code>State</code>, <code>Post Code</code></td><td>No</td><td></td></tr>
+    <tr><td><code>Phone</code>, <code>Email</code></td><td>No</td><td></td></tr>
+    <tr><td><code>Active Status</code></td><td>No</td><td>Active / Inactive</td></tr>
+  </table>
+
+  <h3>Invoice CSV</h3>
+  <table>
+    <tr><th>Column name</th><th>Required</th><th>Notes</th></tr>
+    <tr><td><code>Customer Name/Customer Job</code></td><td>Yes</td><td></td></tr>
+    <tr><td><code>Tax Date</code>, <code>Due Date</code></td><td>Yes</td><td>If due &lt; invoice date, auto-corrected</td></tr>
+    <tr><td><code>Invoice No</code></td><td>Yes</td><td>Max 20 chars; blank → uses txn_id</td></tr>
+    <tr><td><code>Item</code>, <code>QTY</code>, <code>Sales Price</code>, <code>Amount</code></td><td>Yes</td><td>QTY=0 with amount → set to 1</td></tr>
+    <tr><td><code>Tax</code></td><td>No</td><td>GST / FRE / NCG etc.</td></tr>
+  </table>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 11: BADGES ══ -->
+  <div class="section-num">Section 11</div>
+  <h2>Status Badges Explained</h2>
+  <p class="section-intro">Badges appear throughout the application to indicate the status of mappings, anomalies, and reconciliation results.</p>
+
+  <table>
+    <tr><th>Badge</th><th>Context</th><th>Meaning</th></tr>
+    <tr><td><span class="badge badge-green">APPROVED</span></td><td>Account mapping</td><td>Confidence ≥ 85%, both models agree — safe to import</td></tr>
+    <tr><td><span class="badge badge-yellow">REVIEW</span></td><td>Account mapping</td><td>Confidence 60–84% — check before importing</td></tr>
+    <tr><td><span class="badge badge-red">ERROR</span></td><td>Account mapping</td><td>Confidence &lt; 60% or mapping failed — manual fix required</td></tr>
+    <tr><td><span class="badge badge-purple">MEMORY</span></td><td>Account mapping</td><td>Resolved from memory (previously approved) — no AI used</td></tr>
+    <tr><td><span class="badge badge-red">HIGH</span></td><td>Anomaly severity</td><td>Must fix before migration proceeds</td></tr>
+    <tr><td><span class="badge badge-yellow">MEDIUM</span></td><td>Anomaly severity</td><td>Should fix — may affect data accuracy</td></tr>
+    <tr><td><span class="badge badge-blue">LOW</span></td><td>Anomaly severity</td><td>Advisory — review but not blocking</td></tr>
+    <tr><td><span class="badge badge-green">PASSED</span></td><td>Reconciliation</td><td>Trial balance matches — migration ready</td></tr>
+    <tr><td><span class="badge badge-yellow">REVIEW</span></td><td>Reconciliation</td><td>Minor variances — review root cause before import</td></tr>
+    <tr><td><span class="badge badge-red">FAILED</span></td><td>Reconciliation</td><td>Significant discrepancy — do not import until resolved</td></tr>
+  </table>
+
+  <hr class="sep">
+
+
+  <!-- ══ SECTION 12: TROUBLESHOOTING ══ -->
+  <div class="section-num">Section 12</div>
+  <h2>Troubleshooting</h2>
+
+  <table>
+    <tr><th>Problem</th><th>Likely cause</th><th>Solution</th></tr>
+    <tr>
+      <td>Pipeline fails with "API error"</td>
+      <td>Groq API key missing or rate limit hit</td>
+      <td>Wait 30 seconds and retry. Contact support if repeated.</td>
+    </tr>
+    <tr>
+      <td>CSV upload shows 0 accounts</td>
+      <td>Wrong column names in your file</td>
+      <td>Check Section 10 for required column names. Rename columns in your CSV if needed.</td>
+    </tr>
+    <tr>
+      <td>All accounts go to HITL</td>
+      <td>New account types not seen before</td>
+      <td>Normal for first run. After you review and approve, memory saves them — next run will auto-resolve.</td>
+    </tr>
+    <tr>
+      <td>Reconciliation shows FAILED</td>
+      <td>Mandatory accounts (Item Sales, Item Purchase, Rounding) added in Reckon One but not in source TB</td>
+      <td>Expected behaviour. The 3 mandatory accounts add a small variance — the CFO memo will explain this.</td>
+    </tr>
+    <tr>
+      <td>Anomaly: "Invoice_over_75_lines"</td>
+      <td>Invoice has more than 75 line items</td>
+      <td>Reckon One limit is 75 lines. Use Entity Transform → Invoice to auto-consolidate to 1 line.</td>
+    </tr>
+    <tr>
+      <td>Anomaly: "Blank_reference"</td>
+      <td>Journal entry has no reference number</td>
+      <td>The system will use the transaction ID (<code>txn_id</code>) as the reference — no action needed unless you prefer custom refs.</td>
+    </tr>
+    <tr>
+      <td>App loads but shows blank page</td>
+      <td>Browser cache issue</td>
+      <td>Hard refresh: <code>Ctrl + Shift + R</code> (Windows) or <code>Cmd + Shift + R</code> (Mac)</td>
+    </tr>
+  </table>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ℹ</span>
+    <div class="callout-body">
+      <strong>Support</strong>
+      For any issues not covered here, please contact your implementation team with a screenshot of the error and the Run ID shown in the pipeline summary.
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="doc-footer">
+    <div>AI Accounting Migration System · User Manual v1.0</div>
+    <div>Reckon Desktop → Reckon One · April 2026</div>
+    <div>Confidential</div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- PRINT BUTTON (hidden on print) -->
+<div class="no-print" style="position:fixed;bottom:28px;right:28px;z-index:999;">
+  <button onclick="window.print()" style="
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:#fff;border:none;border-radius:10px;
+    padding:12px 24px;font-size:13px;font-weight:600;
+    cursor:pointer;box-shadow:0 4px 20px rgba(99,102,241,0.35);
+    font-family:'Inter',sans-serif;letter-spacing:0.03em;
+  ">⬇ Save as PDF</button>
+</div>
+
+</body>
+</html>
