@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Accounting Migration — System Flow Diagram</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f0f13;
+    color: #e2e2e2;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .page-header h1 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+  .page-header p {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 6px;
+  }
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+  }
+  .badge-purple { background: #1e1a3a; color: #a78bfa; border-color: #5b3fd4; }
+  .badge-teal   { background: #0d2520; color: #34d399; border-color: #0f6e56; }
+  .badge-amber  { background: #241a08; color: #fbbf24; border-color: #854f0b; }
+  .badge-blue   { background: #0a1929; color: #60a5fa; border-color: #185fa5; }
+
+  /* ── Diagram canvas ── */
+  .diagram {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* ── Layer labels ── */
+  .layer-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #555;
+    text-align: left;
+    padding: 0 0 6px 4px;
+  }
+
+  /* ── Rows ── */
+  .row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 0;
+    position: relative;
+  }
+
+  /* ── Arrow connector between rows ── */
+  .arrow-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 36px;
+    position: relative;
+  }
+  .arrow-row::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #333, #444);
+  }
+  .arrow-row .arrow-head {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid #444;
+  }
+  .arrow-label {
+    font-size: 10px;
+    color: #666;
+    background: #0f0f13;
+    padding: 0 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Multi-arrow row (1 to many) ── */
+  .fan-arrow {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 44px;
+    position: relative;
+    margin-bottom: 0;
+  }
+  .fan-line {
+    width: 2px;
+    background: #333;
+    position: relative;
+  }
+  .fan-line::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 9px solid #444;
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: #18181f;
+    border: 1px solid #2a2a35;
+    border-radius: 12px;
+    padding: 14px 16px;
+    flex: 1;
+    min-width: 0;
+    transition: border-color 0.2s, transform 0.15s;
+    cursor: default;
+    position: relative;
+  }
+  .card:hover {
+    border-color: #444;
+    transform: translateY(-2px);
+  }
+  .card.card-purple { border-top: 3px solid #7c3aed; }
+  .card.card-teal   { border-top: 3px solid #0f6e56; }
+  .card.card-amber  { border-top: 3px solid #d97706; }
+  .card.card-blue   { border-top: 3px solid #1d4ed8; }
+  .card.card-coral  { border-top: 3px solid #c2410c; }
+  .card.card-green  { border-top: 3px solid #15803d; }
+  .card.card-gray   { border-top: 3px solid #4b5563; }
+  .card.card-pink   { border-top: 3px solid #9d174d; }
+
+  .card-icon {
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e8e8e8;
+    margin-bottom: 4px;
+  }
+  .card-sub {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.5;
+  }
+  .card-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-top: 6px;
+  }
+  .tag-purple { background: #1e1a3a; color: #a78bfa; }
+  .tag-teal   { background: #0d2520; color: #34d399; }
+  .tag-amber  { background: #241a08; color: #fbbf24; }
+  .tag-blue   { background: #0a1929; color: #60a5fa; }
+  .tag-coral  { background: #2a0e06; color: #fb923c; }
+  .tag-green  { background: #0a1f0e; color: #4ade80; }
+  .tag-gray   { background: #1a1a1f; color: #9ca3af; }
+
+  /* ── Wide single card ── */
+  .card-wide {
+    flex: unset;
+    width: 100%;
+  }
+  .card-wide .card-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .card-wide .sub-item {
+    background: #111116;
+    border: 1px solid #222229;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .card-wide .sub-item .si-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #d0d0d0;
+    margin-bottom: 3px;
+  }
+  .card-wide .sub-item .si-desc {
+    font-size: 10px;
+    color: #555;
+    line-height: 1.4;
+  }
+
+  /* ── Decision diamond ── */
+  .diamond-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+    position: relative;
+  }
+  .diamond-row::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 0; bottom: 0;
+    width: 2px; background: #2a2a35;
+  }
+  .diamond {
+    background: #1c1408;
+    border: 2px solid #d97706;
+    transform: rotate(45deg);
+    width: 50px; height: 50px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1;
+    border-radius: 4px;
+  }
+  .diamond-text {
+    transform: rotate(-45deg);
+    font-size: 9px;
+    font-weight: 600;
+    color: #fbbf24;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .diamond-labels {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .diamond-label {
+    font-size: 10px;
+    color: #888;
+    font-weight: 500;
+  }
+  .diamond-label.yes { color: #4ade80; }
+  .diamond-label.no  { color: #f87171; }
+
+  /* ── Autolearn feedback loop indicator ── */
+  .learn-loop {
+    border: 1px dashed #444;
+    border-radius: 12px;
+    padding: 14px 16px 10px;
+    position: relative;
+    margin-top: 8px;
+  }
+  .learn-loop-label {
+    position: absolute;
+    top: -10px; left: 16px;
+    background: #0f0f13;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fbbf24;
+    letter-spacing: 0.05em;
+    padding: 0 6px;
+  }
+
+  /* ── Output section ── */
+  .output-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .output-card {
+    background: #0d1f12;
+    border: 1px solid #1a4028;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .output-card .oc-title {
+    font-size: 12px; font-weight: 600; color: #4ade80; margin-bottom: 4px;
+  }
+  .output-card .oc-desc {
+    font-size: 10px; color: #4b5563; line-height: 1.4;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    max-width: 1100px;
+    margin: 2rem auto 0;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #1e1e26;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #777;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .legend-line {
+    width: 22px; height: 2px;
+    border-radius: 1px;
+  }
+  .legend-dashed {
+    width: 22px; height: 0;
+    border-top: 2px dashed;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .row { flex-direction: column; }
+    .output-grid { grid-template-columns: 1fr; }
+    .diamond-labels { display: none; }
+    .fan-arrow { height: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>AI Accounting Migration System — Architecture Flow</h1>
+  <p>LangGraph · Groq · Instructor · LlamaIndex · AutoLearn</p>
+  <div class="badge-row">
+    <span class="badge badge-purple">LangGraph Orchestration</span>
+    <span class="badge badge-teal">LlamaIndex RAG</span>
+    <span class="badge badge-amber">Groq LLM Inference</span>
+    <span class="badge badge-blue">Instructor Validation</span>
+  </div>
+</div>
+
+<div class="diagram">
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 1 — INPUT
+  ═══════════════════════════════════════════════ -->
+  <div class="layer-label">INPUT LAYER</div>
+  <div class="row">
+    <div class="card card-gray">
+      <span class="card-icon">🗂</span>
+      <div class="card-title">Source system export</div>
+      <div class="card-sub">Legacy platform CSV / Excel extract<br/>Chart of accounts, journal entries, TB</div>
+      <span class="card-tag tag-gray">Legacy ERP</span>
+    </div>
+    <div class="card card-gray">
+      <span class="card-icon">📋</span>
+      <div class="card-title">Target COA</div>
+      <div class="card-sub">New system account structure<br/>SAP / Oracle / Tally</div>
+      <span class="card-tag tag-gray">New ERP</span>
+    </div>
+    <div class="card card-gray">
+      <span class="card-icon">📅</span>
+      <div class="card-title">Migration config</div>
+      <div class="card-sub">Cutoff date: 31-Mar-2024<br/>FY period definitions, entity list</div>
+      <span class="card-tag tag-gray">Config</span>
+    </div>
+  </div>
+
+  <div class="arrow-row">
+    <span class="arrow-label">pipeline initialised</span>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 2 — ORCHESTRATOR
+  ═══════════════════════════════════════════════ -->
+  <div class="layer-label">ORCHESTRATION LAYER — LangGraph State Machine</div>
+  <div class="row">
+    <div class="card card-wide card-purple">
+      <div class="card-title" style="font-size:14px">🧠 LangGraph Orchestrator</div>
+      <div class="card-sub" style="margin-bottom:10px">Manages shared <code style="font-size:10px;background:#111;padding:1px 5px;border-radius:4px;color:#c084fc">MigrationState</code> · Routes between nodes · Auto-retries on failure · MemorySaver checkpoints every run</div>
+      <div class="card-body">
+        <div class="sub-item">
+          <div class="si-title">State management</div>
+          <div class="si-desc">All agents share a typed state dict. Changes are atomic and logged.</div>
+        </div>
+        <div class="sub-item">
+          <div class="si-title">Conditional routing</div>
+          <div class="si-desc">After mapping, router checks HITL queue → branches to human review or reconcile.</div>
+        </div>
+        <div class="sub-item">
+          <div class="si-title">Checkpointing</div>
+          <div class="si-desc">MemorySaver persists full state. Resume a failed run without restarting.</div>
+        </div>
+        <div class="sub-item">
+          <div class="si-title">Retry logic</div>
+          <div class="si-desc">Instructor max_retries=3. Failed nodes re-execute with adjusted prompts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fan arrows: orchestrator → 3 agents -->
+  <div style="height:48px;position:relative;margin:4px 0">
+    <svg width="100%" height="48" style="overflow:visible">
+      <line x1="50%" y1="0" x2="16.5%" y2="40" stroke="#2a2a35" stroke-width="2"/>
+      <line x1="50%" y1="0" x2="50%"   y2="40" stroke="#2a2a35" stroke-width="2"/>
+      <line x1="50%" y1="0" x2="83.5%" y2="40" stroke="#2a2a35" stroke-width="2"/>
+      <polygon points="0,-6 6,0 -6,0" transform="translate(112,40)" fill="#444"/>
+      <polygon points="0,-6 6,0 -6,0" transform="translate(340,40)" fill="#444"/>
+      <polygon points="0,-6 6,0 -6,0" transform="translate(568,40)" fill="#444"/>
+      <text x="50%" y="22" text-anchor="middle" fill="#555" font-size="10" font-family="sans-serif">parallel execution</text>
+    </svg>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 3 — SPECIALIST AGENTS
+  ═══════════════════════════════════════════════ -->
+  <div class="layer-label">SPECIALIST AGENT LAYER — run in parallel via asyncio</div>
+  <div class="row">
+
+    <div class="card card-blue">
+      <span class="card-icon">🗺</span>
+      <div class="card-title">Mapping Agent</div>
+      <div class="card-sub">
+        RAG lookup → context inject → Groq LLM → Instructor validates <code style="font-size:10px;background:#111;padding:1px 4px;border-radius:3px;color:#93c5fd">AccountMapping</code><br/><br/>
+        High conf ≥85% → auto approve + RAG store<br/>
+        Low conf &lt;70% → HITL queue
+      </div>
+      <span class="card-tag tag-blue">llama-3.3-70b</span>
+    </div>
+
+    <div class="card card-coral">
+      <span class="card-icon">🔍</span>
+      <div class="card-title">Anomaly Agent</div>
+      <div class="card-sub">
+        Pattern context from RAG → Groq LLM → Instructor validates <code style="font-size:10px;background:#111;padding:1px 4px;border-radius:3px;color:#fb923c">AnomalyReport</code><br/><br/>
+        Detects: duplicates, cutoff straddle, interco mismatch, period errors
+      </div>
+      <span class="card-tag tag-coral">llama-3.3-70b</span>
+    </div>
+
+    <div class="card card-teal">
+      <span class="card-icon">⚖️</span>
+      <div class="card-title">Reconcile Agent</div>
+      <div class="card-sub">
+        Source TB vs Migrated TB → Groq LLM → Instructor validates <code style="font-size:10px;background:#111;padding:1px 4px;border-radius:3px;color:#34d399">ReconciliationResult</code><br/><br/>
+        Returns PASSED / REVIEW / FAILED with CFO-ready memo
+      </div>
+      <span class="card-tag tag-teal">llama-3.3-70b</span>
+    </div>
+
+  </div>
+
+  <!-- Decision diamond — HITL routing -->
+  <div class="diamond-row">
+    <div style="position:relative;z-index:2">
+      <div class="diamond">
+        <div class="diamond-text">HITL<br/>queue?</div>
+      </div>
+    </div>
+    <div class="diamond-labels">
+      <span class="diamond-label no">NO → reconcile</span>
+      <span class="diamond-label yes">YES → human review</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 4 — HUMAN IN THE LOOP
+  ═══════════════════════════════════════════════ -->
+  <div class="layer-label" style="margin-top:8px">HUMAN-IN-THE-LOOP NODE — only triggered when confidence &lt; 70%</div>
+  <div class="row">
+    <div class="card card-amber" style="flex:2">
+      <span class="card-icon">👤</span>
+      <div class="card-title">Human review node</div>
+      <div class="card-sub">
+        Pipeline pauses. Reviewer sees: source account, AI suggestion, confidence, reasoning.<br/>
+        Reviewer confirms or overrides the target code.<br/>
+        Decision saved to RAG with <strong style="color:#fbbf24">conf=99%, approved_by=human</strong>.
+        Next run: same account resolves from RAG, no LLM call needed.
+      </div>
+      <span class="card-tag tag-amber">HITL</span>
+    </div>
+    <div class="card card-gray" style="flex:1">
+      <span class="card-icon">💬</span>
+      <div class="card-title">Dual-model check</div>
+      <div class="card-sub">
+        llama-3.3-70b + mixtral-8x7b run in parallel.<br/>
+        Both agree → auto-approve.<br/>
+        Disagree → HITL queue.
+      </div>
+      <span class="card-tag tag-gray">Cross-validate</span>
+    </div>
+  </div>
+
+  <div class="arrow-row">
+    <span class="arrow-label">all nodes complete</span>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 5 — TOOL / FRAMEWORK LAYER
+  ═══════════════════════════════════════════════ -->
+  <div class="layer-label">FRAMEWORK LAYER</div>
+  <div class="row">
+    <div class="card card-purple">
+      <span class="card-icon">⚡</span>
+      <div class="card-title">Groq API</div>
+      <div class="card-sub">Fastest LLM inference<br/>~270 tok/sec on llama-3.3-70b<br/>Low latency per call</div>
+      <span class="card-tag tag-purple">Inference</span>
+    </div>
+    <div class="card card-blue">
+      <span class="card-icon">✅</span>
+      <div class="card-title">Instructor</div>
+      <div class="card-sub">Patches Groq client<br/>Pydantic-validated outputs<br/>Auto-retry on parse fail</div>
+      <span class="card-tag tag-blue">Structured output</span>
+    </div>
+    <div class="card card-teal">
+      <span class="card-icon">🔎</span>
+      <div class="card-title">LlamaIndex RAG</div>
+      <div class="card-sub">BGE-small embeddings<br/>Semantic vector search<br/>Past decision retrieval</div>
+      <span class="card-tag tag-teal">Memory</span>
+    </div>
+    <div class="card card-green">
+      <span class="card-icon">🗄</span>
+      <div class="card-title">SQLite store</div>
+      <div class="card-sub">Mapping rules, patterns<br/>Human corrections<br/>Audit log (JSONL)</div>
+      <span class="card-tag tag-green">Persistence</span>
+    </div>
+  </div>
+
+  <div class="arrow-row">
+    <span class="arrow-label">decisions persisted</span>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 6 — AUTOLEARN
+  ═══════════════════════════════════════════════ -->
+  <div class="learn-loop">
+    <div class="learn-loop-label">⟳ AUTOLEARN FEEDBACK LOOP</div>
+    <div class="layer-label" style="padding-top:6px">Gets smarter every run</div>
+    <div class="row">
+      <div class="card card-amber">
+        <span class="card-icon">💾</span>
+        <div class="card-title">RAG memory update</div>
+        <div class="card-sub">Every approved mapping (auto or human) is embedded and stored. Next run retrieves top-3 similar decisions as LLM context.</div>
+      </div>
+      <div class="card card-amber">
+        <span class="card-icon">📐</span>
+        <div class="card-title">Pattern library</div>
+        <div class="card-sub">Each anomaly is saved with a pattern_key. Same anomaly type found again → pre-labelled instantly, LLM load reduced.</div>
+      </div>
+      <div class="card card-amber">
+        <span class="card-icon">🔧</span>
+        <div class="card-title">Prompt improvement</div>
+        <div class="card-sub">After 50+ corrections, Groq synthesises all feedback into sharper system-prompt rules injected into future agent runs.</div>
+      </div>
+      <div class="card card-amber">
+        <span class="card-icon">📈</span>
+        <div class="card-title">Confidence drift</div>
+        <div class="card-sub">Accounts corrected by humans get conf=99. Same account next run → served from cache, zero latency, zero API cost.</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:#6b5a2a;text-align:center">
+      Run 1: RAG empty → some HITL  ·  Run 2: human decisions cached → fewer HITL  ·  Run N: most accounts auto-resolve from memory
+    </div>
+  </div>
+
+  <div class="arrow-row">
+    <span class="arrow-label">report generated</span>
+    <div class="arrow-head"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LAYER 7 — OUTPUT
+  ═══════════════════════════════════════════════ -->
+  <div class="layer-label">OUTPUT LAYER</div>
+  <div class="output-grid">
+    <div class="output-card">
+      <div class="oc-title">📊 Account mapping report</div>
+      <div class="oc-desc">Every source account with target code, confidence %, status, and AI reasoning. Export to Excel / CSV.</div>
+    </div>
+    <div class="output-card">
+      <div class="oc-title">🚨 Anomaly report</div>
+      <div class="oc-desc">All detected issues with severity (high/medium/low), finding, and recommended action. Sorted by priority.</div>
+    </div>
+    <div class="output-card">
+      <div class="oc-title">⚖️ TB reconciliation memo</div>
+      <div class="oc-desc">CFO-ready reconciliation. PASSED / REVIEW / FAILED verdict with variance breakdown and next steps.</div>
+    </div>
+    <div class="output-card">
+      <div class="oc-title">📝 Audit trail (JSONL)</div>
+      <div class="oc-desc">Every agent decision logged with timestamp, input hash, model used, and output. Full traceability.</div>
+    </div>
+    <div class="output-card">
+      <div class="oc-title">🧠 RAG memory (SQLite)</div>
+      <div class="oc-desc">Persistent knowledge base grows with each run. Human corrections stored with conf=99 for future retrieval.</div>
+    </div>
+    <div class="output-card">
+      <div class="oc-title">📋 Improved prompt rules</div>
+      <div class="oc-desc">After 50+ corrections, AI generates sharper agent instructions injected automatically into next pipeline run.</div>
+    </div>
+  </div>
+
+</div><!-- /diagram -->
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#7c3aed"></div> LangGraph node</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0f6e56"></div> RAG / Memory</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d97706"></div> HITL / AutoLearn</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1d4ed8"></div> Groq / Instructor</div>
+  <div class="legend-item"><div class="legend-line" style="background:#444"></div> Data flow</div>
+  <div class="legend-item"><div class="legend-dashed" style="border-color:#555"></div> Feedback loop</div>
+</div>
+
+</body>
+</html>

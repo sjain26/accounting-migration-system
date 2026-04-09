@@ -1,0 +1,7 @@
+Customer Name,Company Name,Line 1/Street1,City,State,Post Code,Phone,Email,Tax Reg ID,Terms,Credit Limit,Active Status,Contact
+G & J Woodworks Timber%%$$,G & J Woodworks,123 Main Street,Sydney,NSW,2000,0412345678,gj@example.com,12345678901,Net 30,5000,Active,John Smith
+No Name,,,,,,,,,,0,Active,
+McDermott Aviations:Sunshine Coast Airport,McDermott Aviations,Airport Rd,Maroochydore,QLD,4558,0754321234,mc@aviations.com,,Net 15,10000,Active,
+G & J Woodworks Timber%%$$,Duplicate Company,456 Other St,Melbourne,VIC,3000,0398765432,dup@example.com,,,0,Active,
+Berardos Restaurant,Berardos Pty Ltd,Berardos Restaurant,Surry Hills,NSW,2010,0293214567,info@berardos.com.au,,Due on receipt,2000,Inactive,Maria
+AJ Wash Services,AJ Washing Services,78 Clean Ave,Brisbane,QLD,4000,0732198765,aj@wash.com,,Net 30,1000,Active,

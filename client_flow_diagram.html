@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Accounting Migration System — Client Flow</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0b0b12;
+    color: #d0d0e0;
+    min-height: 100vh;
+    padding: 40px 24px 60px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #e8e8ff;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+  }
+
+  /* ── FLOW WRAPPER ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  /* ── PHASE LABELS ── */
+  .phase-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #444;
+    align-self: flex-start;
+    margin-left: 60px;
+    margin-bottom: 6px;
+    margin-top: 18px;
+  }
+
+  /* ── BOXES ── */
+  .box {
+    width: 620px;
+    border-radius: 12px;
+    border: 1px solid #222230;
+    padding: 20px 26px;
+    position: relative;
+  }
+  .box-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .box-icon { font-size: 20px; }
+  .box-desc {
+    font-size: 12.5px;
+    color: #888;
+    line-height: 1.65;
+  }
+  .box-desc ul { padding-left: 16px; margin-top: 4px; }
+  .box-desc li { margin-bottom: 3px; }
+
+  /* Colors per phase */
+  .box-input    { background: #111120; border-color: #2a2a45; }
+  .box-input    .box-title { color: #818cf8; }
+
+  .box-rules    { background: #0f1a0f; border-color: #1a3020; }
+  .box-rules    .box-title { color: #4ade80; }
+
+  .box-memory   { background: #0f0f20; border-color: #1e1e40; }
+  .box-memory   .box-title { color: #a78bfa; }
+
+  .box-llm      { background: #1a1008; border-color: #3a2800; }
+  .box-llm      .box-title { color: #fbbf24; }
+
+  .box-hitl     { background: #1a0808; border-color: #3a1010; }
+  .box-hitl     .box-title { color: #f87171; }
+
+  .box-anomaly  { background: #0f1520; border-color: #1a2535; }
+  .box-anomaly  .box-title { color: #38bdf8; }
+
+  .box-recon    { background: #100f1a; border-color: #201e30; }
+  .box-recon    .box-title { color: #c084fc; }
+
+  .box-output   { background: #0b160b; border-color: #153015; }
+  .box-output   .box-title { color: #86efac; }
+
+  /* ── ARROW ── */
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin: 2px 0;
+  }
+  .arrow-line {
+    width: 2px;
+    height: 28px;
+    background: linear-gradient(to bottom, #333, #555);
+  }
+  .arrow-head {
+    width: 0; height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid #555;
+  }
+  .arrow-label {
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  /* ── BRANCH / PARALLEL SECTION ── */
+  .branch-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    width: 860px;
+    justify-content: center;
+  }
+  .branch-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    max-width: 280px;
+  }
+  .branch-box {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid #222230;
+    padding: 16px 18px;
+  }
+  .branch-box .box-title { font-size: 13px; margin-bottom: 6px; }
+  .branch-box .box-desc  { font-size: 11.5px; }
+
+  /* ── DECISION DIAMOND ── */
+  .diamond-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 4px 0;
+  }
+  .diamond {
+    width: 160px;
+    height: 50px;
+    background: #181825;
+    border: 1px solid #333;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #aaa;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── CONNECTOR LINES FOR BRANCH ── */
+  .branch-connector {
+    display: flex;
+    align-items: flex-start;
+    width: 860px;
+    justify-content: center;
+    position: relative;
+    height: 40px;
+  }
+  .h-line {
+    position: absolute;
+    top: 0;
+    height: 2px;
+    background: #444;
+  }
+  .v-down {
+    position: absolute;
+    width: 2px;
+    background: linear-gradient(to bottom, #444, #555);
+  }
+
+  /* ── BADGE PILLS ── */
+  .pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-right: 5px;
+    margin-top: 4px;
+  }
+  .pill-green  { background: #0a2015; color: #4ade80; border: 1px solid #15803d; }
+  .pill-yellow { background: #1a1505; color: #fbbf24; border: 1px solid #854d0e; }
+  .pill-red    { background: #180a0a; color: #f87171; border: 1px solid #991b1b; }
+  .pill-purple { background: #0a0a20; color: #c084fc; border: 1px solid #5b21b6; }
+  .pill-blue   { background: #050f1a; color: #38bdf8; border: 1px solid #0369a1; }
+
+  /* ── EXPLANATION SECTION ── */
+  .explanation {
+    max-width: 860px;
+    margin: 56px auto 0;
+  }
+  .exp-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #444;
+    border-bottom: 1px solid #1a1a22;
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+  }
+  .exp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .exp-card {
+    background: #0f0f18;
+    border: 1px solid #1e1e2a;
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+  .exp-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .exp-card-body {
+    font-size: 12px;
+    color: #777;
+    line-height: 1.7;
+  }
+  .exp-card-body strong { color: #aaa; }
+
+  @media (max-width: 700px) {
+    .box { width: 95vw; }
+    .branch-row, .branch-connector { width: 95vw; }
+    .exp-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>AI Accounting Migration System</h1>
+<p class="subtitle">Reckon Desktop &nbsp;→&nbsp; Reckon One &nbsp;·&nbsp; End-to-End Flow</p>
+
+<div class="flow">
+
+  <!-- ══ INPUT ══ -->
+  <div class="phase-label">1 · Input Layer</div>
+  <div class="box box-input">
+    <div class="box-title"><span class="box-icon">📂</span> Client Data Upload</div>
+    <div class="box-desc">
+      <ul>
+        <li><strong>Source Accounts (COA)</strong> — Reckon Desktop Chart of Accounts CSV</li>
+        <li><strong>Target Accounts</strong> — Reckon One target account structure</li>
+        <li><strong>Journal Entries</strong> — Historical transactions &amp; cutoff date</li>
+        <li><strong>Trial Balance</strong> — Source TB vs Migrated TB for reconciliation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ RULES ENGINE ══ -->
+  <div class="phase-label">2 · Deterministic Rules Engine</div>
+  <div class="box box-rules">
+    <div class="box-title"><span class="box-icon">⚙️</span> Rules Engine (rules_engine.py)</div>
+    <div class="box-desc">
+      Zero AI cost — all deterministic transforms applied first:
+      <ul>
+        <li>COA type mapping: 27 Desktop types → Reckon One types (Bank, Equity, Current Assets…)</li>
+        <li>Account code cleaning: max 7 chars, strip date prefixes (AUG-25), dots, special chars</li>
+        <li>Mandatory accounts: Item Sales (Income), Item Purchase (COGS), Rounding (Liability)</li>
+        <li>Transaction mapping: Invoice→Invoice, Cheque→Make Payment, Paycheque→Journal…</li>
+        <li>Tax codes: N→NTD, ADJ-P→AJA, ADJ-S→AJS; start date 01/07/2000</li>
+        <li>Duplicate names: suffix -A, -B; "No Name" → "No Name-C"</li>
+        <li>Multi-currency: multiply amounts × exchange rate (Reckon One has no multi-currency)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ MEMORY LOOKUP ══ -->
+  <div class="phase-label">3 · Memory &amp; RAG Lookup</div>
+  <div class="box box-memory">
+    <div class="box-title"><span class="box-icon">🧠</span> Memory Store + RAG Context</div>
+    <div class="box-desc">
+      <ul>
+        <li>Checks SQLite memory for <strong>previously approved mappings</strong> — reuses instantly</li>
+        <li>LlamaIndex RAG retrieves <strong>similar past accounts</strong> as few-shot context</li>
+        <li>Learned anomaly patterns from past runs injected into AI prompts</li>
+        <li>Auto-approved accounts skip LLM entirely &rarr; faster &amp; cheaper</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ DECISION: needs LLM? ══ -->
+  <div class="diamond-wrap">
+    <div class="diamond">Needs AI?</div>
+  </div>
+
+  <!-- BRANCH: YES / NO -->
+  <!-- YES path -->
+  <div class="arrow" style="margin-top:4px;"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <div class="phase-label">4a · AI Mapping (LLM Path)</div>
+  <div class="box box-llm">
+    <div class="box-title"><span class="box-icon">🤖</span> Dual-Model LLM Inference (Groq)</div>
+    <div class="box-desc">
+      Only accounts not resolved by rules/memory reach here:
+      <ul>
+        <li><strong>Primary model</strong> + <strong>Validator model</strong> run in parallel</li>
+        <li>Both receive: Reckon rules context + RAG similar accounts + account details</li>
+        <li>If both models agree &amp; confidence ≥ threshold → <span class="pill pill-green">AUTO APPROVED</span></li>
+        <li>If confidence medium → <span class="pill pill-yellow">REVIEW</span></li>
+        <li>If models disagree or low confidence → <span class="pill pill-red">HITL QUEUE</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ HITL ══ -->
+  <div class="phase-label">4b · Human-in-the-Loop (HITL)</div>
+  <div class="box box-hitl">
+    <div class="box-title"><span class="box-icon">👤</span> Human Review Queue</div>
+    <div class="box-desc">
+      <ul>
+        <li>Low-confidence or disagreed mappings surfaced to <strong>accountant via Streamlit UI</strong></li>
+        <li>Human approves / overrides / provides correct mapping</li>
+        <li>Decision saved to memory → improves future runs automatically</li>
+        <li>If no HITL items, this step is skipped entirely</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ ANOMALY ══ -->
+  <div class="phase-label">5 · Anomaly Detection</div>
+  <div class="box box-anomaly">
+    <div class="box-title"><span class="box-icon">🔍</span> Anomaly Agent (Journal Entries)</div>
+    <div class="box-desc">
+      Scans all journal entries for Reckon-specific issues:
+      <ul>
+        <li>Duplicate references, blank refs, special chars in ref numbers</li>
+        <li>Cutoff date violations (revenue recognised in wrong period)</li>
+        <li>GST rounding mismatches, multi-currency not converted</li>
+        <li>Invoice &gt;75 lines (needs consolidation), QTY=0 with amount</li>
+        <li>Bank/CC accounts used as item income/expense accounts</li>
+        <li>Inactive accounts used in transactions during conversion period</li>
+      </ul>
+      Each anomaly rated: <span class="pill pill-red">HIGH</span> <span class="pill pill-yellow">MEDIUM</span> <span class="pill pill-blue">LOW</span>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ RECONCILIATION ══ -->
+  <div class="phase-label">6 · Trial Balance Reconciliation</div>
+  <div class="box box-recon">
+    <div class="box-title"><span class="box-icon">📊</span> Reconcile Agent (CFO-Level)</div>
+    <div class="box-desc">
+      <ul>
+        <li>Compares source TB vs migrated TB account-by-account</li>
+        <li>Calculates net variance and flags discrepancies</li>
+        <li>AI explains root cause: GST rounding, mandatory account creation, multi-currency…</li>
+        <li>Returns: <span class="pill pill-green">PASSED</span> <span class="pill pill-yellow">REVIEW</span> <span class="pill pill-red">FAILED</span> + risk level + next steps</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arrow"><div class="arrow-line"></div><div class="arrow-head"></div></div>
+
+  <!-- ══ OUTPUT ══ -->
+  <div class="phase-label">7 · Output &amp; Reporting</div>
+  <div class="box box-output">
+    <div class="box-title"><span class="box-icon">✅</span> Final Report (Streamlit UI / CLI)</div>
+    <div class="box-desc">
+      <ul>
+        <li><strong>Account Mapping Table</strong>: Source → Target with confidence &amp; status badges</li>
+        <li><strong>Anomaly Report</strong>: All issues with severity &amp; recommended actions</li>
+        <li><strong>Reconciliation Summary</strong>: TB status, variance breakdown, CFO memo, next steps</li>
+        <li><strong>AutoLearn</strong>: Patterns &amp; approved mappings saved to memory for next migration</li>
+        <li>Export: downloadable CSV / JSON results</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- /flow -->
+
+
+<!-- ══════════════════ EXPLANATION SECTION ══════════════════ -->
+<div class="explanation">
+  <div class="exp-title">System Components — Detailed Explanation</div>
+  <div class="exp-grid">
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#818cf8;">📂 Data Sources</div>
+      <div class="exp-card-body">
+        The client uploads <strong>Reckon Desktop</strong> exports: Chart of Accounts CSV, Journal Entries, and Trial Balance sheets. The system also accepts the <strong>Reckon One target account structure</strong> (pre-configured or uploaded). All data is normalised on ingestion to handle varying column names across different Reckon Desktop versions.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#4ade80;">⚙️ Rules Engine</div>
+      <div class="exp-card-body">
+        Built from the <strong>45-sheet Reckon mapping spreadsheet (Nov 2024)</strong>. Covers 30 entity types with deterministic transforms — no AI needed. Handles: 27 COA type mappings, 19 tax codes, transaction type conversions, account code formatting, mandatory account creation, and multi-currency flattening. This runs first and is <strong>free (zero LLM cost)</strong>.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#a78bfa;">🧠 Memory + RAG</div>
+      <div class="exp-card-body">
+        <strong>SQLite memory</strong> stores every human-approved and auto-approved mapping. On each new run, the system first checks memory — if the same account type/name was seen before, it reuses the result instantly. <strong>LlamaIndex RAG</strong> retrieves similar past accounts as examples for the LLM. This means the system gets <strong>smarter with every migration run</strong>.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#fbbf24;">🤖 Dual-Model AI</div>
+      <div class="exp-card-body">
+        Only ambiguous accounts (not resolved by rules or memory) reach the LLM. Two Groq models run <strong>in parallel</strong> — a primary and a validator. If both agree and confidence is high, the mapping is auto-approved. If they disagree or confidence is low, the account is queued for <strong>human review</strong>. This dual-check prevents hallucinations from reaching production.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#f87171;">👤 Human-in-the-Loop</div>
+      <div class="exp-card-body">
+        Uncertain mappings are surfaced in the <strong>Streamlit web UI</strong> for the accountant to review. The human can approve, override, or correct each mapping. All decisions are saved to memory — the next migration of a similar client will automatically benefit from these corrections <strong>without needing human review again</strong>.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#38bdf8;">🔍 Anomaly Detection</div>
+      <div class="exp-card-body">
+        The anomaly agent scans journal entries for <strong>10+ Reckon-specific issue types</strong> beyond standard accounting anomalies (duplicates, cutoff issues). It knows about Reckon One's specific constraints: 75-line invoice limit, no multi-currency support, GST rounding rules, restricted account usage. Each finding includes a <strong>recommended remediation action</strong>.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#c084fc;">📊 Reconciliation</div>
+      <div class="exp-card-body">
+        The reconcile agent performs a <strong>CFO-level trial balance comparison</strong>. It calculates account-level variances between the source (pre-migration) and migrated TB, identifies root causes specific to Reckon (mandatory account additions, GST rounding accounts, multi-currency adjustments), and produces a <strong>board-ready summary memo</strong> with next steps.
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-card-title" style="color:#86efac;">✅ AutoLearn &amp; Output</div>
+      <div class="exp-card-body">
+        After each run, <strong>AutoLearn</strong> extracts patterns from anomalies and mappings and saves them to the memory store. Future runs start with this institutional knowledge baked in. The final output is a complete <strong>migration package</strong>: approved account map, anomaly list with fixes, reconciliation report — all exportable as CSV/JSON for the client's records.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tech stack footer -->
+  <div style="margin-top:32px; padding:18px 22px; background:#0d0d18; border:1px solid #1a1a28; border-radius:10px; font-size:12px; color:#555;">
+    <span style="color:#333; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; font-size:10px;">Tech Stack &nbsp;·&nbsp;</span>
+    <span style="color:#666;">LangGraph (state machine) &nbsp;·&nbsp; Groq (LLM inference) &nbsp;·&nbsp; LlamaIndex (RAG) &nbsp;·&nbsp; SQLite (memory) &nbsp;·&nbsp; Streamlit (UI) &nbsp;·&nbsp; Python async</span>
+  </div>
+</div>
+
+</body>
+</html>

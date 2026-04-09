@@ -1,0 +1,7 @@
+Customer Name/Customer Job,Tax Date,Due Date,Invoice No,Item,Account Code,Description,QTY,Sales Price,Tax,Tax Amount,Amount,Amount Include Tax,txn_id
+G & J Woodworks Timber,2024-03-15,2024-04-15,V214757,Timber Panels,4-0000,Supply of hardwood panels,10,250,GST,250,2750,Exclusive,TXN-001
+Berardos Restaurant,2024-03-20,2024-03-10,V214800,,4-0000,Monthly service fee,1,500,GST,50,550,Inclusive,TXN-002
+McDermott Aviations,2024-03-25,2024-04-25,,B832083,4-0000,Aviation parts supply,0,1200,GST,120,1320,Exclusive,TXN-003
+G & J Woodworks Timber,2024-03-28,2024-04-28,V214757,Timber Panels,4-0000,Duplicate invoice number,5,250,GST,125,1375,Exclusive,TXN-004
+AJ Washing Services,2024-04-02,2024-05-02,INV-@#$%2024,,4-0000,Window cleaning services,3,180,NCG,54,594,Exclusive,TXN-005
+No Name-C,2024-03-31,2024-04-30,V214999,,4-5000,Misc income,1,75,FRE,0,75,Exclusive,TXN-006
