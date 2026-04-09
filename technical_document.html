@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Technical Document — AI Accounting Migration System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;font-size:12.5px;line-height:1.7;color:#1e1e2e;background:#fff;}
+
+@media print{
+  .no-print{display:none!important;}
+  body{font-size:11px;}
+  .page-break{page-break-before:always;}
+  .cover{page-break-after:always;min-height:auto;padding:80px 60px;}
+  section{page-break-inside:avoid;}
+  a{color:inherit;text-decoration:none;}
+  pre{white-space:pre-wrap;word-break:break-all;}
+}
+
+/* COVER */
+.cover{
+  min-height:100vh;
+  background:linear-gradient(150deg,#020010 0%,#0a0520 40%,#050d20 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px;text-align:center;position:relative;overflow:hidden;
+}
+.cover::before{content:'';position:absolute;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(99,102,241,0.07) 0%,transparent 70%);top:-200px;right:-200px;}
+.cover::after{content:'';position:absolute;width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,0.05) 0%,transparent 70%);bottom:-150px;left:-150px;}
+.cover-tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:0.22em;
+  text-transform:uppercase;color:#818cf8;background:rgba(99,102,241,0.1);
+  border:1px solid rgba(99,102,241,0.25);padding:5px 16px;border-radius:20px;margin-bottom:28px;position:relative;z-index:1;}
+.cover-logo{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;
+  color:#383860;margin-bottom:40px;position:relative;z-index:1;}
+.cover-title{font-size:40px;font-weight:800;color:#fff;line-height:1.1;
+  margin-bottom:10px;position:relative;z-index:1;}
+.cover-title span{background:linear-gradient(135deg,#818cf8,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.cover-sub{font-size:15px;color:#383870;font-weight:300;margin-bottom:36px;position:relative;z-index:1;}
+.cover-url{font-family:'JetBrains Mono',monospace;font-size:12px;color:#3a3a6a;
+  background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.15);
+  padding:8px 20px;border-radius:8px;margin-bottom:48px;position:relative;z-index:1;}
+.cover-url span{color:#6366f1;}
+.cover-meta{display:flex;gap:48px;justify-content:center;position:relative;z-index:1;}
+.cm-item{text-align:center;}
+.cm-label{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#252545;margin-bottom:4px;}
+.cm-val{font-size:12.5px;color:#4a4a7a;font-weight:500;}
+.cover-footer{position:absolute;bottom:28px;font-size:10px;color:#1e1e36;z-index:1;letter-spacing:0.05em;}
+
+/* CONTENT */
+.content{max-width:900px;margin:0 auto;padding:60px 44px;}
+
+/* TOC */
+.toc{background:#f7f7ff;border:1px solid #dde0ff;border-radius:12px;padding:32px 36px;margin-bottom:56px;}
+.toc-title{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#6366f1;margin-bottom:18px;}
+.toc-list{list-style:none;}
+.toc-section{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;margin:14px 0 4px;}
+.toc-list li{display:flex;justify-content:space-between;align-items:center;
+  padding:5px 0;border-bottom:1px dashed #e0e4ff;font-size:12px;color:#374151;}
+.toc-list li:last-child{border-bottom:none;}
+.toc-num{font-weight:700;color:#6366f1;margin-right:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;}
+.toc-dots{flex:1;border-bottom:1px dashed #c7d2fe;margin:0 10px;height:12px;}
+.toc-page{font-size:10.5px;color:#9ca3af;font-family:'JetBrains Mono',monospace;}
+
+/* TYPOGRAPHY */
+.sec-tag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:0.18em;
+  text-transform:uppercase;color:#6366f1;background:#eef2ff;padding:3px 10px;border-radius:4px;margin-bottom:10px;}
+h2{font-size:22px;font-weight:800;color:#0f0f1e;margin-bottom:6px;}
+.sec-intro{font-size:12.5px;color:#6b7280;margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid #f3f4f6;}
+h3{font-size:14.5px;font-weight:700;color:#1f2937;margin:26px 0 10px;
+  display:flex;align-items:center;gap:8px;}
+h3::before{content:'';display:inline-block;width:3px;height:16px;
+  background:linear-gradient(to bottom,#6366f1,#8b5cf6);border-radius:2px;}
+h4{font-size:11.5px;font-weight:700;color:#374151;margin:16px 0 6px;
+  text-transform:uppercase;letter-spacing:0.07em;}
+p{margin-bottom:10px;color:#374151;}
+ul,ol{padding-left:18px;color:#4b5563;margin-bottom:10px;}
+li{margin-bottom:4px;font-size:12.5px;}
+strong{color:#1f2937;}
+a{color:#6366f1;text-decoration:none;}
+
+/* CODE */
+code{font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:#f1f5f9;color:#6366f1;padding:2px 6px;border-radius:4px;}
+pre{background:#0f0f1e;color:#cdd6f4;font-family:'JetBrains Mono',monospace;
+  font-size:11px;padding:18px 20px;border-radius:10px;margin:12px 0;
+  overflow-x:auto;line-height:1.65;border:1px solid #1e1e2e;}
+pre .c{color:#45475a;}pre .k{color:#89b4fa;}pre .s{color:#a6e3a1;}
+pre .f{color:#cba6f7;}pre .n{color:#f38ba8;}pre .m{color:#fab387;}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:11.5px;}
+th{background:#f1f5f9;font-weight:700;text-align:left;padding:9px 12px;
+  color:#374151;font-size:10.5px;letter-spacing:0.04em;text-transform:uppercase;border:1px solid #e2e8f0;}
+td{padding:9px 12px;border:1px solid #f1f5f9;color:#4b5563;vertical-align:top;}
+tr:nth-child(even) td{background:#fafbff;}
+.td-code{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#6366f1;}
+
+/* CALLOUTS */
+.callout{border-radius:8px;padding:13px 16px;margin:14px 0;font-size:12px;
+  display:flex;gap:10px;align-items:flex-start;line-height:1.6;}
+.callout-icon{font-size:15px;flex-shrink:0;margin-top:1px;}
+.callout-body{flex:1;}
+.callout-body strong{display:block;margin-bottom:2px;font-size:11px;letter-spacing:0.04em;}
+.ci{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;}
+.cw{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.cs{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d;}
+.ce{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;}
+
+/* ARCH DIAGRAM */
+.arch-diagram{background:#070712;border:1px solid #1a1a2e;border-radius:12px;
+  padding:28px;margin:18px 0;font-family:'JetBrains Mono',monospace;}
+.arch-row{display:flex;align-items:stretch;gap:0;margin-bottom:0;}
+.arch-layer{border-radius:8px;padding:12px 16px;margin-bottom:8px;position:relative;}
+.arch-label{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;
+  margin-bottom:8px;opacity:0.6;}
+.arch-nodes{display:flex;gap:8px;flex-wrap:wrap;}
+.arch-node{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:6px;padding:7px 12px;font-size:10.5px;color:#9090c0;white-space:nowrap;}
+.arch-arrow{text-align:center;color:#2a2a4a;font-size:12px;margin:3px 0;}
+.al-input   {background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.12);}
+.al-input   .arch-label{color:#818cf8;}
+.al-rules   {background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12);}
+.al-rules   .arch-label{color:#34d399;}
+.al-ai      {background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.12);}
+.al-ai      .arch-label{color:#fbbf24;}
+.al-memory  {background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.12);}
+.al-memory  .arch-label{color:#a78bfa;}
+.al-out     {background:rgba(74,222,128,0.06);border:1px solid rgba(74,222,128,0.12);}
+.al-out     .arch-label{color:#4ade80;}
+
+/* SPEC BLOCKS */
+.spec-block{background:#fafbff;border:1px solid #e8eaff;border-radius:8px;
+  padding:16px 18px;margin:12px 0;}
+.spec-title{font-size:11px;font-weight:700;color:#4b5580;margin-bottom:10px;
+  text-transform:uppercase;letter-spacing:0.07em;}
+
+/* BADGE */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;
+  border-radius:20px;font-family:'JetBrains Mono',monospace;vertical-align:middle;}
+.bg{background:#dcfce7;color:#15803d;border:1px solid #86efac;}
+.by{background:#fef9c3;color:#854d0e;border:1px solid #fde047;}
+.br{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.bb{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;}
+.bp{background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;}
+
+/* FLOW STEPS */
+.flow-step{display:flex;gap:14px;align-items:flex-start;
+  background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;padding:14px 16px;margin-bottom:10px;}
+.fs-num{min-width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#6366f1,#8b5cf6);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.fs-title{font-size:13px;font-weight:600;color:#1f2937;margin-bottom:3px;}
+.fs-desc{font-size:11.5px;color:#6b7280;line-height:1.6;}
+
+/* ENDPOINT BLOCK */
+.endpoint{background:#f8faff;border:1px solid #dde4ff;border-radius:8px;
+  padding:14px 16px;margin:10px 0;}
+.ep-method{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;
+  border-radius:4px;font-family:'JetBrains Mono',monospace;margin-right:8px;}
+.ep-get {background:#dbeafe;color:#1d4ed8;}
+.ep-post{background:#dcfce7;color:#15803d;}
+.ep-path{font-family:'JetBrains Mono',monospace;font-size:12px;color:#1f2937;}
+.ep-desc{font-size:11.5px;color:#6b7280;margin-top:4px;}
+
+/* HR */
+hr{border:none;border-top:1px solid #f3f4f6;margin:44px 0;}
+
+/* FOOTER */
+.doc-footer{margin-top:56px;padding-top:20px;border-top:1px solid #f3f4f6;
+  display:flex;justify-content:space-between;font-size:10.5px;color:#9ca3af;}
+</style>
+</head>
+<body>
+
+<!-- ══════ COVER ══════ -->
+<div class="cover">
+  <div class="cover-logo">DocPulse AI</div>
+  <div class="cover-tag">Technical Documentation · v1.0.0</div>
+  <div class="cover-title">AI Accounting<br><span>Migration System</span></div>
+  <div class="cover-sub">Production Architecture · API Reference · Deployment Guide · Security</div>
+  <div class="cover-url">🌐 &nbsp;<span>https://accounting-migration-system-ai.streamlit.app/</span></div>
+  <div class="cover-meta">
+    <div class="cm-item"><div class="cm-label">Document type</div><div class="cm-val">Technical Reference</div></div>
+    <div class="cm-item"><div class="cm-label">Version</div><div class="cm-val">1.0.0</div></div>
+    <div class="cm-item"><div class="cm-label">Stack</div><div class="cm-val">Python 3.12 · LangGraph · Groq</div></div>
+    <div class="cm-item"><div class="cm-label">Date</div><div class="cm-val">April 2026</div></div>
+    <div class="cm-item"><div class="cm-label">Classification</div><div class="cm-val">Confidential</div></div>
+  </div>
+  <div class="cover-footer">Reckon Desktop → Reckon One · AI Migration System · Technical Documentation</div>
+</div>
+
+
+<!-- ══════ CONTENT ══════ -->
+<div class="content">
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ul class="toc-list">
+    <div class="toc-section">Architecture</div>
+    <li><span><span class="toc-num">01</span>System Overview & Design Principles</span><span class="toc-dots"></span><span class="toc-page">2</span></li>
+    <li><span><span class="toc-num">02</span>Architecture Diagram</span><span class="toc-dots"></span><span class="toc-page">3</span></li>
+    <li><span><span class="toc-num">03</span>LangGraph State Machine</span><span class="toc-dots"></span><span class="toc-page">4</span></li>
+    <div class="toc-section">Core Components</div>
+    <li><span><span class="toc-num">04</span>Rules Engine (rules_engine.py)</span><span class="toc-dots"></span><span class="toc-page">5</span></li>
+    <li><span><span class="toc-num">05</span>AI Agents (agents.py)</span><span class="toc-dots"></span><span class="toc-page">6</span></li>
+    <li><span><span class="toc-num">06</span>Memory & RAG Store</span><span class="toc-dots"></span><span class="toc-page">7</span></li>
+    <li><span><span class="toc-num">07</span>AutoLearn Module</span><span class="toc-dots"></span><span class="toc-page">8</span></li>
+    <div class="toc-section">Data & API</div>
+    <li><span><span class="toc-num">08</span>Data Models & Schemas</span><span class="toc-dots"></span><span class="toc-page">9</span></li>
+    <li><span><span class="toc-num">09</span>Groq API Integration</span><span class="toc-dots"></span><span class="toc-page">10</span></li>
+    <li><span><span class="toc-num">10</span>Database Schema (SQLite)</span><span class="toc-dots"></span><span class="toc-page">11</span></li>
+    <div class="toc-section">Deployment & Operations</div>
+    <li><span><span class="toc-num">11</span>Deployment Guide (Streamlit Cloud)</span><span class="toc-dots"></span><span class="toc-page">12</span></li>
+    <li><span><span class="toc-num">12</span>Configuration Reference</span><span class="toc-dots"></span><span class="toc-page">13</span></li>
+    <li><span><span class="toc-num">13</span>Security & Secrets Management</span><span class="toc-dots"></span><span class="toc-page">14</span></li>
+    <li><span><span class="toc-num">14</span>Performance & Cost Analysis</span><span class="toc-dots"></span><span class="toc-page">15</span></li>
+    <li><span><span class="toc-num">15</span>Error Handling & Observability</span><span class="toc-dots"></span><span class="toc-page">16</span></li>
+    <li><span><span class="toc-num">16</span>Extending the System</span><span class="toc-dots"></span><span class="toc-page">17</span></li>
+  </ul>
+</div>
+
+
+<!-- ══ 01: OVERVIEW ══ -->
+<div class="sec-tag">Section 01</div>
+<h2>System Overview & Design Principles</h2>
+<p class="sec-intro">
+  The AI Accounting Migration System is a production-grade pipeline that automates migration of financial data from <strong>Reckon Desktop</strong> to <strong>Reckon One</strong>. It is built on a layered architecture that prioritises determinism, cost efficiency, and human oversight.
+</p>
+
+<h3>Design Principles</h3>
+<table>
+  <tr><th>Principle</th><th>Implementation</th></tr>
+  <tr><td><strong>Rules-first</strong></td><td>Deterministic Reckon rules applied before any LLM call. 60–80% of accounts resolved at zero AI cost.</td></tr>
+  <tr><td><strong>Dual-model validation</strong></td><td>Primary + validator LLM run in parallel. Agreement required for auto-approval. Prevents hallucinations.</td></tr>
+  <tr><td><strong>Human-in-the-loop</strong></td><td>Low-confidence and disagreed mappings surfaced to accountant via UI. No unreviewed data reaches import.</td></tr>
+  <tr><td><strong>AutoLearn memory</strong></td><td>Every approved mapping persisted to SQLite + RAG. Next migration reuses without LLM or human intervention.</td></tr>
+  <tr><td><strong>Async concurrency</strong></td><td>All agent calls use <code>asyncio</code> + <code>Semaphore(2)</code>. Dual-model calls run in parallel via <code>run_in_executor</code>.</td></tr>
+  <tr><td><strong>Stateful pipeline</strong></td><td>LangGraph state machine with MemorySaver checkpoint. Full state recoverable across interruptions.</td></tr>
+</table>
+
+<h3>Technology Stack</h3>
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Version</th><th>Purpose</th></tr>
+  <tr><td>UI</td><td>Streamlit</td><td class="td-code">≥1.35.0</td><td>Web interface, file uploads, HITL review</td></tr>
+  <tr><td>Pipeline</td><td>LangGraph</td><td class="td-code">≥1.1.3</td><td>State machine, node routing, checkpointing</td></tr>
+  <tr><td>LLM inference</td><td>Groq API</td><td class="td-code">≥1.0.0</td><td>llama-3.3-70b-versatile + llama-3.1-8b-instant</td></tr>
+  <tr><td>Structured output</td><td>Instructor</td><td class="td-code">≥1.7.0</td><td>Pydantic-validated LLM responses</td></tr>
+  <tr><td>Semantic memory</td><td>Custom RAG (numpy)</td><td class="td-code">—</td><td>Cosine similarity over 64-dim char embeddings</td></tr>
+  <tr><td>Persistence</td><td>SQLite</td><td class="td-code">built-in</td><td>Mappings, patterns, run history, audit log</td></tr>
+  <tr><td>Data processing</td><td>Pandas</td><td class="td-code">≥2.0.0</td><td>CSV parsing, TB calculations, entity transforms</td></tr>
+  <tr><td>Runtime</td><td>Python</td><td class="td-code">3.12</td><td>Base runtime</td></tr>
+  <tr><td>Deployment</td><td>Streamlit Cloud</td><td class="td-code">—</td><td>Managed hosting, secrets management</td></tr>
+  <tr><td>VCS</td><td>GitHub</td><td class="td-code">—</td><td>sjain26/accounting-migration-system</td></tr>
+</table>
+
+<hr>
+
+<!-- ══ 02: ARCHITECTURE ══ -->
+<div class="sec-tag">Section 02</div>
+<h2>Architecture Diagram</h2>
+<p class="sec-intro">End-to-end data flow from client upload through AI pipeline to final report.</p>
+
+<div class="arch-diagram">
+  <div style="text-align:center;font-size:10px;color:#2a2a5a;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:20px;">System Architecture — Data Flow</div>
+
+  <div class="arch-layer al-input">
+    <div class="arch-label">① Input Layer</div>
+    <div class="arch-nodes">
+      <div class="arch-node">Streamlit UI</div>
+      <div class="arch-node">ALL DATA CSV upload</div>
+      <div class="arch-node">Source Accounts CSV</div>
+      <div class="arch-node">Journal Entries CSV</div>
+      <div class="arch-node">Trial Balance CSV</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ &nbsp; parse_all_data_csv() / session_state</div>
+
+  <div class="arch-layer al-rules">
+    <div class="arch-label">② Rules Engine — rules_engine.py (zero LLM cost)</div>
+    <div class="arch-nodes">
+      <div class="arch-node">transform_coa_record()</div>
+      <div class="arch-node">batch_transform()</div>
+      <div class="arch-node">COA_TYPE_MAP (27 types)</div>
+      <div class="arch-node">TAX_CODE_MAP (19 codes)</div>
+      <div class="arch-node">TRANSACTION_TYPE_MAP</div>
+      <div class="arch-node">validate_migration_readiness()</div>
+      <div class="arch-node">get_mandatory_coa_accounts()</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ &nbsp; LangGraph graph.invoke(initial_state)</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;">
+    <div class="arch-layer al-memory" style="margin-bottom:0;">
+      <div class="arch-label">③ Memory + RAG — memory.py / rag_store.py</div>
+      <div class="arch-nodes" style="flex-direction:column;">
+        <div class="arch-node">lookup_mapping() → SQLite</div>
+        <div class="arch-node">MigrationRAG.search() → cosine sim</div>
+        <div class="arch-node">build_context() → few-shot examples</div>
+      </div>
+    </div>
+    <div class="arch-layer al-ai" style="margin-bottom:0;">
+      <div class="arch-label">④ AI Agents — agents.py (async)</div>
+      <div class="arch-nodes" style="flex-direction:column;">
+        <div class="arch-node">mapping_agent_async() — dual model</div>
+        <div class="arch-node">anomaly_agent_async() — Groq</div>
+        <div class="arch-node">reconcile_agent_async() — CFO level</div>
+      </div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ &nbsp; route_after_mapping() → HITL or Anomaly</div>
+
+  <div class="arch-layer" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.12);margin-bottom:8px;">
+    <div class="arch-label" style="color:#f87171;">⑤ HITL Node — hitl_node() / Streamlit UI</div>
+    <div class="arch-nodes">
+      <div class="arch-node">hitl_queue surface to accountant</div>
+      <div class="arch-node">accept_correction() → autolearn.py</div>
+      <div class="arch-node">save_mapping(approved_by="human")</div>
+    </div>
+  </div>
+  <div class="arch-arrow">↓ &nbsp; → anomaly_node() → reconcile_node() → report_node()</div>
+
+  <div class="arch-layer al-out">
+    <div class="arch-label">⑥ Output + Persistence</div>
+    <div class="arch-nodes">
+      <div class="arch-node">Account mappings CSV</div>
+      <div class="arch-node">Anomaly report</div>
+      <div class="arch-node">TB reconciliation + CFO memo</div>
+      <div class="arch-node">migration_memory.db</div>
+      <div class="arch-node">agent_decisions.jsonl</div>
+      <div class="arch-node">save_run() → run history</div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ══ 03: LANGGRAPH ══ -->
+<div class="sec-tag">Section 03</div>
+<h2>LangGraph State Machine</h2>
+<p class="sec-intro">The pipeline is implemented as a directed acyclic graph (DAG) using LangGraph's <code>StateGraph</code>. State is typed, accumulated across nodes, and checkpointed with <code>MemorySaver</code>.</p>
+
+<h3>State Schema (MigrationState)</h3>
+<pre><code><span class="k">class</span> <span class="f">MigrationState</span>(TypedDict):
+    <span class="c"># ── Inputs ─────────────────────────────────────────────────</span>
+    source_accounts  : list[dict]      <span class="c"># Reckon Desktop COA records</span>
+    target_accounts  : list[dict]      <span class="c"># Reckon One target accounts</span>
+    journal_entries  : list[dict]      <span class="c"># General journal entries</span>
+    source_tb        : dict            <span class="c"># {code: (name, amount)}</span>
+    migrated_tb      : dict            <span class="c"># {code: amount}</span>
+    cutoff_date      : str             <span class="c"># "YYYY-MM-DD"</span>
+
+    <span class="c"># ── Outputs — accumulated with operator.add ─────────────────</span>
+    mappings         : Annotated[list, operator.add]
+    anomalies        : Annotated[list, operator.add]
+    recon_result     : dict
+    hitl_queue       : Annotated[list, operator.add]
+    errors           : Annotated[list, operator.add]
+    run_complete     : bool
+    progress_log     : Annotated[list, operator.add]
+</code></pre>
+
+<h3>Node Definitions & Routing</h3>
+<table>
+  <tr><th>Node</th><th>Function</th><th>Calls</th><th>Routing</th></tr>
+  <tr><td><code>mapping</code></td><td><code>mapping_node()</code></td><td><code>mapping_agent_async()</code></td><td>→ <code>hitl</code> if hitl_queue else → <code>anomaly</code></td></tr>
+  <tr><td><code>hitl</code></td><td><code>hitl_node()</code></td><td>Pass-through (UI handles)</td><td>→ <code>anomaly</code> always</td></tr>
+  <tr><td><code>anomaly</code></td><td><code>anomaly_node()</code></td><td><code>anomaly_agent_async()</code></td><td>→ <code>reconcile</code></td></tr>
+  <tr><td><code>reconcile</code></td><td><code>reconcile_node()</code></td><td><code>reconcile_agent_async()</code></td><td>→ <code>report</code></td></tr>
+  <tr><td><code>report</code></td><td><code>report_node()</code></td><td>Sets <code>run_complete=True</code></td><td>→ <code>END</code></td></tr>
+</table>
+
+<pre><code><span class="c"># Graph construction — graph.py</span>
+g = StateGraph(MigrationState)
+g.set_entry_point(<span class="s">"mapping"</span>)
+g.add_conditional_edges(<span class="s">"mapping"</span>, route_after_mapping,
+                        {<span class="s">"hitl"</span>: <span class="s">"hitl"</span>, <span class="s">"anomaly"</span>: <span class="s">"anomaly"</span>})
+g.add_edge(<span class="s">"hitl"</span>, <span class="s">"anomaly"</span>)
+g.add_edge(<span class="s">"anomaly"</span>, <span class="s">"reconcile"</span>)
+g.add_edge(<span class="s">"reconcile"</span>, <span class="s">"report"</span>)
+g.add_edge(<span class="s">"report"</span>, END)
+graph = g.compile(checkpointer=MemorySaver())
+</code></pre>
+
+<hr>
+
+<!-- ══ 04: RULES ENGINE ══ -->
+<div class="page-break"></div>
+<div class="sec-tag">Section 04</div>
+<h2>Rules Engine — rules_engine.py</h2>
+<p class="sec-intro">All deterministic transforms derived from the official <strong>45-sheet Reckon mapping specification (Nov 2024)</strong>. Applied before any LLM call. Covers 30 entity types.</p>
+
+<h3>COA Type Mapping — 27 account types</h3>
+<table>
+  <tr><th>Reckon Desktop</th><th>Reckon One</th><th>Reckon Desktop</th><th>Reckon One</th></tr>
+  <tr><td>Bank</td><td>Bank</td><td>Other Current Liability</td><td>Other Current Liablity</td></tr>
+  <tr><td>Accounts Receivable</td><td>Accounts Receivable (A/R)</td><td>Long Term Liability</td><td>Non-Current Liability</td></tr>
+  <tr><td>Other Current Asset</td><td>Current assets</td><td>Other Liability</td><td>Non-Current Liability</td></tr>
+  <tr><td>Fixed Asset</td><td>Non-Current Asset</td><td>Equity</td><td>Owner's equity</td></tr>
+  <tr><td>Other Asset</td><td>Non-Current Asset</td><td>Retained Earnings</td><td>Retained Earnings Surplus/…</td></tr>
+  <tr><td>Accounts Payable</td><td>Accounts Payable (A/P)</td><td>Suspense</td><td>Non-Current Liability</td></tr>
+  <tr><td>Credit Card</td><td>Bank</td><td>Income</td><td>Income</td></tr>
+  <tr><td>Cost of Goods Sold</td><td>Cost of Goods Sold</td><td>Expense</td><td>Expense</td></tr>
+</table>
+
+<h3>Key Transform Rules (applied per record)</h3>
+<table>
+  <tr><th>Rule</th><th>Logic</th></tr>
+  <tr><td>Account code max 7 chars</td><td>Truncate <code>Accnt. #</code> to 7 characters</td></tr>
+  <tr><td>Strip date prefix</td><td>Regex remove <code>AUG-25</code>, <code>JAN-24</code> style prefixes from codes</td></tr>
+  <tr><td>Strip special chars</td><td>Remove <code>$%^&*()</code>, dots from account codes and names</td></tr>
+  <tr><td>Duplicate names</td><td>Append <code>-A</code>, <code>-B</code> suffix on collision; "No Name" → "No Name-C"</td></tr>
+  <tr><td>Inactive → Active</td><td>All inactive entities imported as Active for conversion period</td></tr>
+  <tr><td>Multi-currency</td><td>Multiply all amounts by exchange rate (Reckon One: no multi-currency)</td></tr>
+  <tr><td>Reference max 20 chars</td><td>Invoice/Journal/Bill/Cheque ref truncated; blank → <code>txn_id</code>; duplicate → append txn_id</td></tr>
+  <tr><td>QTY=0 with amount</td><td>Set QTY to 1</td></tr>
+  <tr><td>Due date before invoice</td><td>Set due_date = invoice_date</td></tr>
+  <tr><td>Invoice >75 lines</td><td>Consolidate to 1-line summary with total amount</td></tr>
+  <tr><td>Restricted account in item</td><td>Bank/CC/Retained Earnings as item income → replace with Item Sales; as expense → Item Purchase + journal</td></tr>
+  <tr><td>Description-only lines</td><td>Skip lines with no item, amount, or quantity</td></tr>
+</table>
+
+<h3>Mandatory Accounts (created before any import)</h3>
+<table>
+  <tr><th>Account Name</th><th>Type</th><th>Purpose</th></tr>
+  <tr><td>Item Sales</td><td>Income</td><td>Default income account for items with restricted income account</td></tr>
+  <tr><td>Item Purchase</td><td>Cost of Goods Sold</td><td>Default COGS for items with restricted expense account</td></tr>
+  <tr><td>Rounding</td><td>Non-Current Liability</td><td>GST rounding adjustments in Reckon One</td></tr>
+</table>
+
+<h3>Tax Code Mapping — 19 codes</h3>
+<table>
+  <tr><th>Desktop Code</th><th>Reckon One Code</th><th>Rate</th><th>Desktop Code</th><th>Reckon One Code</th><th>Rate</th></tr>
+  <tr><td>N</td><td>NTD</td><td>0%</td><td>ADJ-P</td><td>AJA</td><td>10%</td></tr>
+  <tr><td>GST</td><td>GST</td><td>10%</td><td>ADJ-S</td><td>AJS</td><td>10%</td></tr>
+  <tr><td>FRE</td><td>GST-free</td><td>0%</td><td>NCG</td><td>NCG</td><td>10%</td></tr>
+  <tr><td colspan="6" style="text-align:center;color:#9ca3af;font-style:italic;">+ 13 additional codes. Tax code start date always set to 01/07/2000.</td></tr>
+</table>
+
+<hr>
+
+<!-- ══ 05: AGENTS ══ -->
+<div class="sec-tag">Section 05</div>
+<h2>AI Agents — agents.py</h2>
+<p class="sec-intro">Three async agents implement the AI reasoning layer. All use Groq for LLM inference with exponential backoff retry on rate limits.</p>
+
+<h3>mapping_agent_async()</h3>
+<p>Processes each source account through a 4-stage resolution pipeline:</p>
+<div class="flow-step"><div class="fs-num">1</div><div><div class="fs-title">Direct type match via COA_TYPE_MAP</div><div class="fs-desc">If source type key exists in rules map → find first target with matching Reckon One type. Confidence: 95%. Source: <code>rules</code>. No LLM called.</div></div></div>
+<div class="flow-step"><div class="fs-num">2</div><div><div class="fs-title">Memory lookup via lookup_mapping()</div><div class="fs-desc">SQLite query by <code>(name, type)</code> composite key. If found → reuse previously approved mapping. Source: <code>memory</code>. No LLM called.</div></div></div>
+<div class="flow-step"><div class="fs-num">3</div><div><div class="fs-title">Dual-model LLM inference</div><div class="fs-desc">Primary (<code>llama-3.3-70b-versatile</code>) + Validator (<code>llama-3.1-8b-instant</code>) run <strong>in parallel</strong> via <code>asyncio.gather()</code>. Both receive: Reckon context + RAG few-shot examples. Average confidence computed. Source: <code>llm</code>.</div></div></div>
+<div class="flow-step"><div class="fs-num">4</div><div><div class="fs-title">Auto-approve or HITL queue</div><div class="fs-desc">avg_conf ≥ AUTO_THRESHOLD and models agree → <span class="badge bg">APPROVED</span>. avg_conf ≥ 60 → <span class="badge by">REVIEW</span>. avg_conf < HITL_THRESHOLD or disagreement → <span class="badge br">HITL QUEUE</span>.</div></div></div>
+
+<pre><code><span class="c"># Semaphore limits concurrent Groq calls to avoid rate limits</span>
+_sem = asyncio.Semaphore(2)
+
+async with _sem:
+    primary_task   = loop.run_in_executor(None, _call, MODEL_PRIMARY,   system, user, 400)
+    validator_task = loop.run_in_executor(None, _call, MODEL_VALIDATE,  system, user, 300)
+    primary, validator = await asyncio.gather(primary_task, validator_task)
+
+agree    = (primary.get(<span class="s">"target_code"</span>) == validator.get(<span class="s">"target_code"</span>))
+avg_conf = (int(primary[<span class="s">"confidence"</span>]) + int(validator[<span class="s">"confidence"</span>])) // 2
+</code></pre>
+
+<h3>anomaly_agent_async()</h3>
+<p>Scans all journal entries against 10 Reckon-specific anomaly types plus 4 standard types:</p>
+<table>
+  <tr><th>Issue Type</th><th>Detection Logic</th><th>Severity</th></tr>
+  <tr><td><code>Duplicate_ref</code></td><td>Same reference used in multiple entries</td><td><span class="badge br">HIGH</span></td></tr>
+  <tr><td><code>Blank_reference</code></td><td>Ref field is empty or null</td><td><span class="badge by">MEDIUM</span></td></tr>
+  <tr><td><code>Special_chars_in_ref</code></td><td>Ref contains chars not accepted by Reckon One</td><td><span class="badge by">MEDIUM</span></td></tr>
+  <tr><td><code>Cutoff risk</code></td><td>Revenue recognised after cutoff date</td><td><span class="badge br">HIGH</span></td></tr>
+  <tr><td><code>GST_rounding</code></td><td>Tax amount doesn't match expected GST calculation</td><td><span class="badge by">MEDIUM</span></td></tr>
+  <tr><td><code>Multi_currency_unconverted</code></td><td>Foreign currency amounts not in base currency</td><td><span class="badge br">HIGH</span></td></tr>
+  <tr><td><code>Invoice_over_75_lines</code></td><td>Invoice exceeds Reckon One's 75-line limit</td><td><span class="badge br">HIGH</span></td></tr>
+  <tr><td><code>Zero_qty_with_amount</code></td><td>QTY=0 but Amount is non-zero</td><td><span class="badge by">MEDIUM</span></td></tr>
+  <tr><td><code>Due_before_invoice</code></td><td>Due date earlier than invoice/bill date</td><td><span class="badge by">MEDIUM</span></td></tr>
+  <tr><td><code>Bank_account_in_item</code></td><td>Bank/CC/Retained Earnings used as item income/expense</td><td><span class="badge br">HIGH</span></td></tr>
+  <tr><td><code>Inactive_account_in_tx</code></td><td>Inactive account referenced in active transaction</td><td><span class="badge by">MEDIUM</span></td></tr>
+</table>
+
+<h3>reconcile_agent_async()</h3>
+<p>Performs account-level trial balance comparison and generates a CFO-ready memo:</p>
+<pre><code><span class="c"># Variance computed per account</span>
+for code, val in source_tb.items():
+    name, src = _parse_tb_val(val)
+    mig  = _to_float(migrated_tb.get(code, 0))
+    diff = mig - src
+    <span class="c"># Passed to LLM as structured variance table</span>
+
+<span class="c"># Returns:</span>
+{
+  <span class="s">"overall_status"</span>: <span class="s">"PASSED|REVIEW|FAILED"</span>,
+  <span class="s">"risk_level"</span>:     <span class="s">"low|medium|high"</span>,
+  <span class="s">"net_variance"</span>:   float,
+  <span class="s">"summary"</span>:        <span class="s">"CFO-ready 2-3 sentence memo"</span>,
+  <span class="s">"next_steps"</span>:     [<span class="s">"step1"</span>, <span class="s">"step2"</span>, <span class="s">"step3"</span>]
+}
+</code></pre>
+
+<hr>
+
+<!-- ══ 06: MEMORY & RAG ══ -->
+<div class="sec-tag">Section 06</div>
+<h2>Memory & RAG Store</h2>
+<p class="sec-intro">Two complementary persistence mechanisms provide the system's learning capability.</p>
+
+<h3>SQLite Memory (memory.py)</h3>
+<p>Stores approved mappings by composite key <code>(account_name, account_type)</code>. Queried before any LLM call.</p>
+<pre><code><span class="c"># lookup_mapping() — O(1) exact match</span>
+SELECT target_code, target_name, confidence, approved_by
+FROM mappings
+WHERE account_name = ? AND account_type = ?
+ORDER BY confidence DESC LIMIT 1
+</code></pre>
+
+<h3>RAG Store (rag_store.py)</h3>
+<p>Lightweight semantic search using 64-dimensional character-level hash embeddings and cosine similarity.</p>
+<pre><code><span class="k">def</span> <span class="f">_embed</span>(self, text: str) -> np.ndarray:
+    vec   = np.zeros(64)
+    words = text.lower().split()
+    for wi, word in enumerate(words):
+        for ci, ch in enumerate(word):
+            vec[(wi * 7 + ci) % 64] += ord(ch) / 1000.0
+    norm = np.linalg.norm(vec)
+    return (vec / norm) if norm > 0 else vec
+
+<span class="c"># Returns top-3 most similar past decisions as few-shot context</span>
+<span class="k">def</span> <span class="f">build_context</span>(self, query: str) -> str:
+    results = self.search(query, top_k=3)
+    <span class="c"># Injected into LLM system prompt as "Relevant past decisions"</span>
+</code></pre>
+
+<div class="callout ci"><span class="callout-icon">ℹ</span><div class="callout-body"><strong>Production upgrade path</strong>Replace the character-hash embedder with a proper embedding model (e.g. <code>BAAI/bge-small-en</code>) and swap <code>sqlite</code> for <code>ChromaDB</code> or <code>Qdrant</code> for production-scale vector search without changing the <code>MigrationRAG</code> interface.</div></div>
+
+<hr>
+
+<!-- ══ 07: AUTOLEARN ══ -->
+<div class="sec-tag">Section 07</div>
+<h2>AutoLearn Module — autolearn.py</h2>
+<p class="sec-intro">Closes the feedback loop between human corrections and future AI behaviour.</p>
+
+<h3>accept_correction()</h3>
+<pre><code><span class="k">def</span> <span class="f">accept_correction</span>(agent, original_input, original_output, correction):
+    <span class="c"># 1. Save corrected mapping to SQLite with approved_by="human", confidence=99</span>
+    save_mapping(name, typ, target_code, target_name, 99, approved_by=<span class="s">"human"</span>)
+    <span class="c"># 2. Add to RAG store with human_approved=True metadata</span>
+    rag.add(f<span class="s">"{name} {typ}"</span>, {**correction, <span class="s">"approved_by"</span>: <span class="s">"human"</span>})
+    <span class="c"># 3. Log correction to agent_decisions.jsonl for audit</span>
+    log_decision(<span class="s">"hitl_correction"</span>, original_input, correction)
+</code></pre>
+
+<h3>generate_improved_prompt_rules()</h3>
+<p>After 50+ human corrections, calls Groq to synthesise patterns into improved system prompt rules. Result is stored and prepended to future LLM calls.</p>
+
+<hr>
+
+<!-- ══ 08: DATA MODELS ══ -->
+<div class="page-break"></div>
+<div class="sec-tag">Section 08</div>
+<h2>Data Models & Schemas</h2>
+
+<h3>Source Account (input)</h3>
+<pre><code>{
+  <span class="s">"code"</span>: <span class="s">"1-1000"</span>,            <span class="c"># Reckon Desktop Accnt. # (any format)</span>
+  <span class="s">"name"</span>: <span class="s">"ANZ Business Cheque"</span>, <span class="c"># Account name</span>
+  <span class="s">"type"</span>: <span class="s">"Bank"</span>                  <span class="c"># Reckon Desktop account type</span>
+}
+</code></pre>
+
+<h3>Mapping Result (output)</h3>
+<pre><code>{
+  <span class="s">"source_code"</span>:  <span class="s">"1-1000"</span>,
+  <span class="s">"source_name"</span>:  <span class="s">"ANZ Business Cheque"</span>,
+  <span class="s">"target_code"</span>:  <span class="s">"1001"</span>,
+  <span class="s">"target_name"</span>:  <span class="s">"ANZ Business Cheque"</span>,
+  <span class="s">"confidence"</span>:   95,               <span class="c"># 0-100 average of dual models</span>
+  <span class="s">"reasoning"</span>:    <span class="s">"Direct type match: Bank → Bank"</span>,
+  <span class="s">"models_agree"</span>: true,             <span class="c"># primary.target_code == validator.target_code</span>
+  <span class="s">"source"</span>:       <span class="s">"rules"</span>,           <span class="c"># "rules" | "memory" | "llm"</span>
+  <span class="s">"status"</span>:       <span class="s">"approved"</span>,        <span class="c"># "approved" | "review" | "error"</span>
+  <span class="s">"_reckon_type"</span>: <span class="s">"Bank"</span>,            <span class="c"># Post-transform Reckon One type</span>
+  <span class="s">"_rules"</span>:       [<span class="s">"COA_type_map: Bank→Bank"</span>]
+}
+</code></pre>
+
+<h3>Anomaly Record</h3>
+<pre><code>{
+  <span class="s">"ref"</span>:                <span class="s">"JE-002"</span>,
+  <span class="s">"issue_type"</span>:         <span class="s">"Duplicate_ref"</span>,
+  <span class="s">"severity"</span>:           <span class="s">"high"</span>,
+  <span class="s">"finding"</span>:            <span class="s">"Reference JE-002 appears on 2024-03-31 entries"</span>,
+  <span class="s">"recommended_action"</span>: <span class="s">"Append txn_id to make reference unique"</span>,
+  <span class="s">"pattern_key"</span>:        <span class="s">"duplicate_je_ref"</span>   <span class="c"># saved to anomaly_patterns table</span>
+}
+</code></pre>
+
+<h3>Reconciliation Result</h3>
+<pre><code>{
+  <span class="s">"overall_status"</span>: <span class="s">"PASSED"</span>,
+  <span class="s">"risk_level"</span>:     <span class="s">"low"</span>,
+  <span class="s">"net_variance"</span>:   -1500,
+  <span class="s">"summary"</span>:        <span class="s">"Net variance of -1,500 attributable to mandatory...</span>",
+  <span class="s">"next_steps"</span>:     [<span class="s">"Verify Item Sales account balance"</span>, ...]
+}
+</code></pre>
+
+<hr>
+
+<!-- ══ 09: GROQ API ══ -->
+<div class="sec-tag">Section 09</div>
+<h2>Groq API Integration</h2>
+
+<h3>Models Used</h3>
+<table>
+  <tr><th>Role</th><th>Model ID</th><th>Max tokens</th><th>Temperature</th><th>Purpose</th></tr>
+  <tr><td>Primary</td><td class="td-code">llama-3.3-70b-versatile</td><td>400</td><td>0.1</td><td>Main reasoning, mapping, anomaly detection</td></tr>
+  <tr><td>Validator</td><td class="td-code">llama-3.1-8b-instant</td><td>300</td><td>0.1</td><td>Dual-validation for mapping consensus</td></tr>
+</table>
+
+<h3>Retry Strategy</h3>
+<pre><code><span class="k">for</span> attempt <span class="k">in</span> range(4):
+    try:
+        resp = client.chat.completions.create(...)
+        break
+    except RateLimitError:
+        if attempt == 3: raise
+        time.sleep(20 * (attempt + 1))  <span class="c"># 20s, 40s, 60s backoff</span>
+</code></pre>
+
+<h3>System Prompt Structure</h3>
+<pre><code>system = (
+    <span class="s">"You are an expert Reckon Desktop → Reckon One migration specialist.\n"</span>
+    <span class="s">"Respond ONLY with valid JSON. No prose.\n\n"</span>
+    f<span class="s">"{_RECKON_CONTEXT}\n"</span>       <span class="c"># 45-sheet rules (built once, cached)</span>
+    f<span class="s">"{rag_ctx}"</span>                 <span class="c"># top-3 similar past decisions</span>
+)
+</code></pre>
+
+<div class="callout cw"><span class="callout-icon">⚠</span><div class="callout-body"><strong>Rate limits</strong>Groq free tier: 30 RPM / 6,000 TPM on 70b model. The <code>Semaphore(2)</code> limits concurrent calls. For production loads &gt;50 accounts, consider upgrading to a paid Groq plan or batching with <code>asyncio.sleep(1)</code> between batches.</div></div>
+
+<hr>
+
+<!-- ══ 10: DATABASE ══ -->
+<div class="sec-tag">Section 10</div>
+<h2>Database Schema — SQLite (migration_memory.db)</h2>
+
+<h3>Tables</h3>
+<pre><code><span class="c">-- Approved account mappings</span>
+CREATE TABLE mappings (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_name TEXT,
+    account_type TEXT,
+    target_code  TEXT,
+    target_name  TEXT,
+    confidence   INTEGER,
+    approved_by  TEXT,        <span class="c">-- "rules_engine" | "auto" | "human"</span>
+    created_at   TEXT
+);
+CREATE UNIQUE INDEX ix_map ON mappings(account_name, account_type);
+
+<span class="c">-- Learned anomaly patterns</span>
+CREATE TABLE anomaly_patterns (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    pattern_key TEXT UNIQUE,
+    description TEXT,
+    severity    TEXT,
+    action      TEXT,
+    count       INTEGER DEFAULT 1,
+    created_at  TEXT
+);
+
+<span class="c">-- Human correction feedback</span>
+CREATE TABLE feedback (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent           TEXT,
+    original_input  TEXT,    <span class="c">-- JSON</span>
+    original_output TEXT,    <span class="c">-- JSON</span>
+    correction      TEXT,    <span class="c">-- JSON</span>
+    created_at      TEXT
+);
+
+<span class="c">-- Pipeline run history</span>
+CREATE TABLE runs (
+    run_id         TEXT PRIMARY KEY,
+    status         TEXT,
+    total_accounts INTEGER,
+    approved       INTEGER,
+    review         INTEGER,
+    errors         INTEGER,
+    anomalies      INTEGER,
+    recon_status   TEXT,
+    started_at     TEXT,
+    completed_at   TEXT
+);
+
+<span class="c">-- RAG semantic memory</span>
+CREATE TABLE rag_entries (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    text       TEXT,
+    embedding  BLOB,   <span class="c">-- 64-dim float64 numpy array</span>
+    metadata   TEXT,   <span class="c">-- JSON</span>
+    created_at TEXT
+);
+</code></pre>
+
+<hr>
+
+<!-- ══ 11: DEPLOYMENT ══ -->
+<div class="page-break"></div>
+<div class="sec-tag">Section 11</div>
+<h2>Deployment Guide — Streamlit Cloud</h2>
+
+<h3>Live Application URL</h3>
+<div class="spec-block">
+  <div class="spec-title">Production URL</div>
+  <code style="font-size:13px;">https://accounting-migration-system-ai.streamlit.app/</code>
+</div>
+
+<h3>Repository</h3>
+<div class="spec-block">
+  <div class="spec-title">GitHub Repository</div>
+  <code>https://github.com/sjain26/accounting-migration-system</code><br/><br/>
+  <strong>Branch:</strong> <code>main</code> &nbsp;·&nbsp; <strong>Entry point:</strong> <code>streamlit_app.py</code>
+</div>
+
+<h3>Deployment Steps</h3>
+<div class="flow-step"><div class="fs-num">1</div><div><div class="fs-title">Push code to GitHub</div><div class="fs-desc">All changes pushed to <code>main</code> branch auto-deploy on Streamlit Cloud (CI/CD is automatic).</div></div></div>
+<div class="flow-step"><div class="fs-num">2</div><div><div class="fs-title">Configure Secrets on Streamlit Cloud</div><div class="fs-desc">Dashboard → App → Settings → Secrets. Add the TOML block below.</div></div></div>
+<div class="flow-step"><div class="fs-num">3</div><div><div class="fs-title">Verify requirements.txt</div><div class="fs-desc">Streamlit Cloud installs from <code>requirements.txt</code> on every deploy. Ensure all dependencies are listed without comments.</div></div></div>
+<div class="flow-step"><div class="fs-num">4</div><div><div class="fs-title">Check runtime</div><div class="fs-desc">Streamlit Cloud uses Python 3.12 by default. No <code>runtime.txt</code> needed.</div></div></div>
+
+<h3>secrets.toml (Streamlit Cloud Dashboard)</h3>
+<pre><code><span class="c"># Settings → Secrets → paste this block</span>
+GROQ_API_KEY = <span class="s">"gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</span>
+</code></pre>
+
+<h3>requirements.txt (current)</h3>
+<pre><code>groq>=1.0.0
+instructor>=1.7.0
+langgraph>=1.1.3
+langchain-core>=1.2.18
+pydantic>=2.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+streamlit>=1.35.0
+python-dotenv>=1.0.0
+rich>=13.0.0
+</code></pre>
+
+<h3>File Structure</h3>
+<pre><code>accounting-migration-system/
+├── streamlit_app.py      <span class="c"># Main UI — entry point</span>
+├── graph.py              <span class="c"># LangGraph state machine</span>
+├── agents.py             <span class="c"># Mapping, anomaly, reconcile agents</span>
+├── rules_engine.py       <span class="c"># Deterministic Reckon transforms (45 sheets)</span>
+├── memory.py             <span class="c"># SQLite CRUD for mappings, patterns, runs</span>
+├── rag_store.py          <span class="c"># Lightweight RAG with numpy cosine similarity</span>
+├── autolearn.py          <span class="c"># Human correction feedback loop</span>
+├── tools.py              <span class="c"># log_decision() audit trail</span>
+├── config.py             <span class="c"># Env-aware config (Streamlit secrets / os.environ)</span>
+├── models.py             <span class="c"># Pydantic data models</span>
+├── main.py               <span class="c"># CLI entry point (non-Streamlit usage)</span>
+├── requirements.txt
+├── .gitignore            <span class="c"># Excludes venv/, *.db, secrets.toml</span>
+├── .streamlit/
+│   └── config.toml       <span class="c"># Streamlit server config</span>
+├── migration_memory.db   <span class="c"># SQLite (gitignored — regenerated on first run)</span>
+└── agent_decisions.jsonl <span class="c"># Audit log (gitignored)</span>
+</code></pre>
+
+<hr>
+
+<!-- ══ 12: CONFIG ══ -->
+<div class="sec-tag">Section 12</div>
+<h2>Configuration Reference — config.py</h2>
+<p class="sec-intro">All configuration loaded from Streamlit secrets (deployed) or environment variables (local). No hardcoded credentials.</p>
+
+<pre><code><span class="k">import</span> os
+
+<span class="c"># Reads from st.secrets (Streamlit Cloud) or os.environ (local / Docker)</span>
+try:
+    import streamlit as st
+    GROQ_API_KEY = st.secrets.get(<span class="s">"GROQ_API_KEY"</span>, os.environ.get(<span class="s">"GROQ_API_KEY"</span>, <span class="s">""</span>))
+except Exception:
+    GROQ_API_KEY = os.environ.get(<span class="s">"GROQ_API_KEY"</span>, <span class="s">""</span>)
+
+MODEL_PRIMARY   = <span class="s">"llama-3.3-70b-versatile"</span>
+MODEL_VALIDATE  = <span class="s">"llama-3.1-8b-instant"</span>
+HITL_THRESHOLD  = 70     <span class="c"># below this % → human review</span>
+AUTO_THRESHOLD  = 85     <span class="c"># above this % → auto-approve</span>
+DB_PATH         = <span class="s">"migration_memory.db"</span>
+LOG_PATH        = <span class="s">"agent_decisions.jsonl"</span>
+CUTOFF_DATE     = <span class="s">"2024-03-31"</span>
+</code></pre>
+
+<table>
+  <tr><th>Variable</th><th>Default</th><th>Override via</th><th>Description</th></tr>
+  <tr><td><code>GROQ_API_KEY</code></td><td>—</td><td>Streamlit secrets / env</td><td>Required. Groq API key.</td></tr>
+  <tr><td><code>MODEL_PRIMARY</code></td><td>llama-3.3-70b</td><td>config.py edit</td><td>Main reasoning model</td></tr>
+  <tr><td><code>MODEL_VALIDATE</code></td><td>llama-3.1-8b</td><td>config.py edit</td><td>Validation model</td></tr>
+  <tr><td><code>HITL_THRESHOLD</code></td><td>70</td><td>Streamlit sidebar slider</td><td>Below → human review</td></tr>
+  <tr><td><code>AUTO_THRESHOLD</code></td><td>85</td><td>Streamlit sidebar slider</td><td>Above → auto-approve</td></tr>
+  <tr><td><code>DB_PATH</code></td><td>migration_memory.db</td><td>config.py edit</td><td>SQLite file path</td></tr>
+  <tr><td><code>LOG_PATH</code></td><td>agent_decisions.jsonl</td><td>config.py edit</td><td>Audit log file path</td></tr>
+  <tr><td><code>CUTOFF_DATE</code></td><td>2024-03-31</td><td>Streamlit sidebar date picker</td><td>Journal entry cutoff</td></tr>
+</table>
+
+<hr>
+
+<!-- ══ 13: SECURITY ══ -->
+<div class="sec-tag">Section 13</div>
+<h2>Security & Secrets Management</h2>
+
+<h3>Secrets — what is protected</h3>
+<table>
+  <tr><th>Secret</th><th>Storage</th><th>Access pattern</th></tr>
+  <tr><td>GROQ_API_KEY</td><td>Streamlit Cloud secrets dashboard</td><td><code>st.secrets["GROQ_API_KEY"]</code> — never in code or logs</td></tr>
+</table>
+
+<h3>.gitignore — what is excluded from VCS</h3>
+<pre><code>venv/                   <span class="c"># Python virtualenv</span>
+__pycache__/
+*.pyc
+migration_memory.db     <span class="c"># Contains client data — never committed</span>
+agent_decisions.jsonl   <span class="c"># Audit log — may contain sensitive account names</span>
+.env                    <span class="c"># Local env file</span>
+.streamlit/secrets.toml <span class="c"># Local secrets — never committed</span>
+</code></pre>
+
+<h3>Data Security Considerations</h3>
+<table>
+  <tr><th>Risk</th><th>Mitigation</th></tr>
+  <tr><td>API key exposure</td><td>Keys stored in Streamlit secrets, loaded via <code>st.secrets</code>. Never in source code.</td></tr>
+  <tr><td>Client financial data in VCS</td><td><code>migration_memory.db</code> and <code>agent_decisions.jsonl</code> are gitignored.</td></tr>
+  <tr><td>LLM data retention</td><td>Groq does not train on API inputs. Review Groq privacy policy for enterprise deployments.</td></tr>
+  <tr><td>Multi-tenant isolation</td><td>Current: single-tenant (one SQLite DB). For multi-tenant: use per-client DB_PATH or PostgreSQL with row-level security.</td></tr>
+  <tr><td>Audit trail</td><td>Every AI decision logged to <code>agent_decisions.jsonl</code> with timestamp, input hash, and output.</td></tr>
+</table>
+
+<div class="callout cw"><span class="callout-icon">⚠</span><div class="callout-body"><strong>Production recommendation</strong>For multi-client production use: replace SQLite with PostgreSQL, use per-client database isolation, and store <code>agent_decisions.jsonl</code> in S3 or equivalent object storage for durability and compliance.</div></div>
+
+<hr>
+
+<!-- ══ 14: PERFORMANCE ══ -->
+<div class="sec-tag">Section 14</div>
+<h2>Performance & Cost Analysis</h2>
+
+<h3>Latency Profile — typical 10-account run</h3>
+<table>
+  <tr><th>Stage</th><th>Latency</th><th>LLM calls</th><th>Notes</th></tr>
+  <tr><td>Rules engine</td><td>&lt; 50ms</td><td>0</td><td>Pure Python dict lookup + regex</td></tr>
+  <tr><td>Memory lookup</td><td>&lt; 10ms</td><td>0</td><td>SQLite indexed query per account</td></tr>
+  <tr><td>RAG context build</td><td>&lt; 5ms</td><td>0</td><td>Numpy cosine similarity over in-memory embeddings</td></tr>
+  <tr><td>Dual-model LLM (per account)</td><td>1–3 sec</td><td>2</td><td>Parallel via asyncio.gather()</td></tr>
+  <tr><td>Anomaly detection (7 entries)</td><td>3–8 sec</td><td>1</td><td>Single batch call with all entries</td></tr>
+  <tr><td>Reconciliation</td><td>2–5 sec</td><td>1</td><td>Single call with variance table</td></tr>
+  <tr><td><strong>Total (10 accounts)</strong></td><td><strong>15–40 sec</strong></td><td><strong>~5–22</strong></td><td>Depends on % needing LLM</td></tr>
+</table>
+
+<h3>Cost Optimisation — Resolution Tiers</h3>
+<table>
+  <tr><th>Tier</th><th>Resolver</th><th>Cost per account</th><th>Typical %</th></tr>
+  <tr><td>1 — Rules</td><td>COA_TYPE_MAP direct match</td><td>$0.00</td><td>40–60%</td></tr>
+  <tr><td>2 — Memory</td><td>SQLite lookup (previously approved)</td><td>$0.00</td><td>20–40% (grows with runs)</td></tr>
+  <tr><td>3 — LLM auto</td><td>Dual-model, high confidence</td><td>~$0.001</td><td>5–20%</td></tr>
+  <tr><td>4 — LLM + HITL</td><td>Dual-model + human review</td><td>~$0.001 + time</td><td>1–10%</td></tr>
+</table>
+
+<div class="callout cs"><span class="callout-icon">✓</span><div class="callout-body"><strong>Cost trajectory</strong>After 3–4 migrations of similar clients, Tier 1+2 resolve 85–95% of accounts. LLM cost per migration drops to near zero. The system pays for itself within the first few runs.</div></div>
+
+<hr>
+
+<!-- ══ 15: ERROR HANDLING ══ -->
+<div class="sec-tag">Section 15</div>
+<h2>Error Handling & Observability</h2>
+
+<h3>Retry & Fallback Strategy</h3>
+<table>
+  <tr><th>Error type</th><th>Handling</th></tr>
+  <tr><td>Groq RateLimitError</td><td>Exponential backoff: 20s, 40s, 60s. Raises after 4 attempts.</td></tr>
+  <tr><td>LLM returns invalid JSON</td><td><code>json.loads</code> in try/except → returns <code>{}</code>. Account marked <code>error</code> status.</td></tr>
+  <tr><td>Missing target account</td><td><code>target_code=None</code> → status <code>error</code>, surfaced in Results UI.</td></tr>
+  <tr><td>CSV parse failure</td><td>Streamlit UI shows error callout. Pipeline not started.</td></tr>
+  <tr><td>Reconcile agent failure</td><td>Returns default REVIEW response with manual review instruction.</td></tr>
+  <tr><td>Memory DB locked</td><td>SQLite opened with <code>check_same_thread=False</code>. Streamlit multi-thread safe.</td></tr>
+</table>
+
+<h3>Audit Trail — agent_decisions.jsonl</h3>
+<p>Every AI decision is appended as a JSONL record:</p>
+<pre><code>{
+  <span class="s">"ts"</span>:     <span class="s">"2026-04-09T08:14:22.341Z"</span>,
+  <span class="s">"agent"</span>: <span class="s">"mapping_agent"</span>,
+  <span class="s">"hash"</span>:  <span class="s">"a3f2c1..."</span>,               <span class="c"># SHA256 of input</span>
+  <span class="s">"input"</span>: {<span class="s">"name"</span>: <span class="s">"ANZ..."</span>, <span class="s">"type"</span>: <span class="s">"Bank"</span>},
+  <span class="s">"output"</span>:{<span class="s">"target_code"</span>: <span class="s">"1001"</span>, <span class="s">"confidence"</span>: 95, ...}
+}
+</code></pre>
+
+<h3>Observability Checklist</h3>
+<ul>
+  <li>All mapping decisions logged with input hash for deduplication</li>
+  <li>Run history table stores aggregate stats per pipeline run</li>
+  <li>Anomaly patterns table accumulates across runs for trend analysis</li>
+  <li>HITL corrections logged with <code>agent="hitl_correction"</code> for review tracking</li>
+  <li>Streamlit UI — Audit Log page provides filterable decision viewer and full JSONL export</li>
+</ul>
+
+<hr>
+
+<!-- ══ 16: EXTENDING ══ -->
+<div class="sec-tag">Section 16</div>
+<h2>Extending the System</h2>
+
+<h3>Adding a new entity type</h3>
+<ol style="color:#374151;line-height:2.2;font-size:12.5px;">
+  <li>Add transform function <code>transform_&lt;entity&gt;_record(record)</code> in <code>rules_engine.py</code></li>
+  <li>Register in <code>batch_transform()</code>'s dispatch dict</li>
+  <li>Add to <code>ENTITY_OPTIONS</code> dict in <code>streamlit_app.py</code></li>
+  <li>Add column hint to <code>COLUMN_HINTS</code> dict in <code>streamlit_app.py</code></li>
+  <li>Optionally add sample data to <code>SAMPLE_DATA</code> dict</li>
+</ol>
+
+<h3>Upgrading the RAG embedder</h3>
+<pre><code><span class="c"># Replace _embed() in rag_store.py with a proper model</span>
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer(<span class="s">"BAAI/bge-small-en-v1.5"</span>)
+
+<span class="k">def</span> <span class="f">_embed</span>(self, text: str) -> np.ndarray:
+    return model.encode(text, normalize_embeddings=True)
+</code></pre>
+
+<h3>Adding a new LLM provider</h3>
+<pre><code><span class="c"># Replace _call() in agents.py — same interface, different client</span>
+<span class="k">from</span> anthropic <span class="k">import</span> Anthropic
+client = Anthropic(api_key=os.environ[<span class="s">"ANTHROPIC_API_KEY"</span>])
+
+<span class="k">def</span> <span class="f">_call</span>(model, system, user, max_tokens=800):
+    resp = client.messages.create(
+        model=model, max_tokens=max_tokens,
+        system=system, messages=[{<span class="s">"role"</span>:<span class="s">"user"</span>,<span class="s">"content"</span>:user}]
+    )
+    <span class="k">return</span> json.loads(resp.content[0].text)
+</code></pre>
+
+<h3>Scaling to PostgreSQL</h3>
+<pre><code><span class="c"># config.py — add DB_URL for PostgreSQL</span>
+DB_URL = os.environ.get(<span class="s">"DATABASE_URL"</span>, f<span class="s">"sqlite:///{DB_PATH}"</span>)
+
+<span class="c"># memory.py — swap sqlite3 for SQLAlchemy</span>
+from sqlalchemy import create_engine
+engine = create_engine(DB_URL, pool_size=5, max_overflow=10)
+</code></pre>
+
+<div class="callout ci"><span class="callout-icon">ℹ</span><div class="callout-body"><strong>Migration roadmap</strong> — recommended next steps for production hardening: (1) PostgreSQL + connection pooling, (2) BGE-small embedding model, (3) ChromaDB vector store, (4) per-client database isolation, (5) Groq paid tier for higher rate limits, (6) S3 audit log archival.</div></div>
+
+<!-- FOOTER -->
+<div class="doc-footer">
+  <div>AI Accounting Migration System · Technical Documentation v1.0.0</div>
+  <div>https://accounting-migration-system-ai.streamlit.app/</div>
+  <div>Confidential · April 2026</div>
+</div>
+
+</div><!-- /content -->
+</body>
+</html>
