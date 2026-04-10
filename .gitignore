@@ -5,3 +5,4 @@ migration_memory.db
 agent_decisions.jsonl
 .env
 .streamlit/secrets.toml
+.claude
