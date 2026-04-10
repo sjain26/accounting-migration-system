@@ -511,7 +511,93 @@ if page == "🏠 Home":
             </div>""", unsafe_allow_html=True)
 
     st.markdown("---")
-    st.markdown(callout("ℹ️", "<strong>First time?</strong> Go to <strong>🚀 Run Pipeline</strong> in the sidebar. No data upload needed — the system includes sample Reckon Desktop data so you can see the full pipeline in action immediately.", "info"), unsafe_allow_html=True)
+
+    # ── INPUT / OUTPUT GUIDE ──
+    st.markdown('<div class="sdiv">What you need to provide · What you get back</div>', unsafe_allow_html=True)
+    col_in, col_out = st.columns(2)
+
+    with col_in:
+        st.markdown("""
+        <div style="background:#060f09;border:1px solid #14532d;border-radius:12px;padding:20px 22px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4ade80;margin-bottom:14px;">📥 &nbsp;Input — What to upload</div>
+
+          <div style="font-size:12.5px;color:#b0b0c8;font-weight:600;margin-bottom:6px;">1. Reckon Desktop — ALL DATA CSV</div>
+          <div style="font-size:11.5px;color:#44445a;line-height:1.7;margin-bottom:10px;">
+            Export from Reckon Desktop:<br>
+            <span style="color:#2a4a2a;">Reports → Accountant &amp; Taxes → Transaction Detail by Account → Export to CSV</span><br><br>
+            <strong style="color:#6a6a8a;">Required columns:</strong><br>
+            <span style="font-family:monospace;font-size:11px;color:#3a5a3a;">Type · Account · Account Type · Trans # · Date · Description · Debit · Credit</span>
+          </div>
+
+          <div style="border-top:1px solid #0f2a0f;margin:10px 0;"></div>
+
+          <div style="font-size:12.5px;color:#b0b0c8;font-weight:600;margin-bottom:6px;">2. Target Accounts CSV <span style="font-size:10px;color:#333348;">(optional)</span></div>
+          <div style="font-size:11.5px;color:#44445a;line-height:1.7;">
+            Your existing Reckon One chart of accounts.<br>
+            <strong style="color:#6a6a8a;">Required columns:</strong><br>
+            <span style="font-family:monospace;font-size:11px;color:#3a5a3a;">code · name · type</span><br><br>
+            <span style="color:#2a3a2a;">Default targets are already included — only upload if you have custom Reckon One accounts.</span>
+          </div>
+
+          <div style="border-top:1px solid #0f2a0f;margin:10px 0;"></div>
+
+          <div style="font-size:12.5px;color:#b0b0c8;font-weight:600;margin-bottom:6px;">3. Entity CSVs <span style="font-size:10px;color:#333348;">(for Entity Transform page)</span></div>
+          <div style="font-size:11.5px;color:#44445a;line-height:1.7;">
+            Separate exports per entity: COA, Customer, Supplier, Invoice, Journal, Item, etc.<br>
+            Required columns for each entity are shown on the Entity Transform page.
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_out:
+        st.markdown("""
+        <div style="background:#080f1e;border:1px solid #1e3a5f;border-radius:12px;padding:20px 22px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#60a5fa;margin-bottom:14px;">📤 &nbsp;Output — What you receive</div>
+
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #0f1a2f;">
+            <span style="font-size:16px;flex-shrink:0;">📄</span>
+            <div>
+              <div style="font-size:12.5px;color:#c0c0e0;font-weight:600;">account_mappings.csv</div>
+              <div style="font-size:11.5px;color:#3a4a6a;line-height:1.6;">Every source account with its mapped Reckon One target, confidence score, and status (approved / review / error)</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #0f1a2f;">
+            <span style="font-size:16px;flex-shrink:0;">🔍</span>
+            <div>
+              <div style="font-size:12.5px;color:#c0c0e0;font-weight:600;">Anomaly Report (on-screen + CSV)</div>
+              <div style="font-size:11.5px;color:#3a4a6a;line-height:1.6;">10+ Reckon-specific journal issues detected: duplicate refs, blank refs, GST rounding, cutoff violations, and more</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #0f1a2f;">
+            <span style="font-size:16px;flex-shrink:0;">⚖</span>
+            <div>
+              <div style="font-size:12.5px;color:#c0c0e0;font-weight:600;">Trial Balance Reconciliation</div>
+              <div style="font-size:11.5px;color:#3a4a6a;line-height:1.6;">Source vs migrated balance comparison — PASSED / REVIEW / FAILED with variance root-cause analysis</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #0f1a2f;">
+            <span style="font-size:16px;flex-shrink:0;">📋</span>
+            <div>
+              <div style="font-size:12.5px;color:#c0c0e0;font-weight:600;">reckon_one_[entity].csv</div>
+              <div style="font-size:11.5px;color:#3a4a6a;line-height:1.6;">From Entity Transform — Reckon One import-ready CSVs for COA, Customer, Invoice, Journal, and more</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;">
+            <span style="font-size:16px;flex-shrink:0;">🧠</span>
+            <div>
+              <div style="font-size:12.5px;color:#c0c0e0;font-weight:600;">Memory / AutoLearn (saved automatically)</div>
+              <div style="font-size:11.5px;color:#3a4a6a;line-height:1.6;">Every approved mapping is persisted — the next migration resolves identical accounts instantly with no LLM call</div>
+            </div>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(callout("ℹ️", "<strong>First time?</strong> Go straight to <strong>🚀 Run Pipeline</strong>. No CSV upload required — the system includes sample Reckon Desktop data so you can see the full pipeline in action immediately.", "info"), unsafe_allow_html=True)
 
 
 # ════════════════════════════════════════════════════════════
@@ -522,13 +608,13 @@ elif page == "🚀 Run Pipeline":
                 "Upload your Reckon Desktop export and run the full AI migration pipeline end-to-end.")
 
     instruction_box("How to use this page", [
-        "Choose your <strong>upload mode</strong> — Single file (full Reckon export) or Multiple files (separate CSVs).",
-        "Upload your Reckon Desktop CSV file(s). Skip upload to run with built-in sample data.",
-        "Optionally upload a <strong>Target accounts CSV</strong> (Reckon One format). Default targets are provided.",
+        "Choose your <strong>upload mode</strong> — Single file (one complete Reckon export) or Multiple files (separate CSVs per data type).",
+        "Upload your <strong>Reckon Desktop CSV</strong>. No file? Skip it — built-in sample data runs the full demo automatically.",
+        "Optionally upload a <strong>Target accounts CSV</strong> (Reckon One format, columns: code, name, type). Default targets are already included.",
         "Adjust <strong>Pipeline Settings</strong> in the sidebar if needed (HITL threshold, auto-approve %, cutoff date).",
-        "Click <strong>▶ Run Pipeline</strong> and watch the live progress log.",
-        "After completion, go to <strong>📊 Results</strong> to see mappings, anomalies, and reconciliation.",
-    ], tip="No CSV file? Click Run Pipeline anyway — sample Reckon Desktop data is used automatically for demonstration.")
+        "Click <strong>▶ Run Pipeline</strong> and watch the live progress log — each stage is tracked in real time.",
+        "After completion, go to <strong>📊 Results</strong> to review mappings, the anomaly report, and reconciliation — then <strong>download CSVs</strong>.",
+    ], tip="First time? Just click Run Pipeline without uploading anything — the system will use sample Reckon Desktop data to demonstrate the full pipeline.")
 
     # Active Reckon rules preview
     with st.expander("📋 View active Reckon migration rules (applied before any AI call)", expanded=False):
@@ -649,6 +735,45 @@ elif page == "🚀 Run Pipeline":
                 st.dataframe(pd.DataFrame([
                     {"Account":code,"Balance":f"{bal:,}"} for code,bal in mig_tb.items()
                 ]), use_container_width=True)
+
+    # ── SAMPLE CSV DOWNLOAD ──
+    st.markdown('<div class="sdiv">Sample CSV Format</div>', unsafe_allow_html=True)
+    st.markdown(callout("💡", "Not sure what format your CSV should be in? Download the sample below — it matches the exact column structure of a Reckon Desktop ALL DATA export.", "info"), unsafe_allow_html=True)
+
+    sample_df = pd.DataFrame([
+        {"Type":"General Journal","Account":"ANZ Business Cheque","Account Type":"Bank","Trans #":1,"Date":"2024-03-31","Num":"","Description":"Opening balance transfer","Debit":48235000,"Credit":0},
+        {"Type":"General Journal","Account":"Accounts Receivable","Account Type":"Accounts Receivable","Trans #":2,"Date":"2024-03-31","Num":"JE-002","Description":"Depreciation accrual Q4","Debit":0,"Credit":1205000},
+        {"Type":"General Journal","Account":"Sales – domestic","Account Type":"Income","Trans #":3,"Date":"2024-03-29","Num":"JE-003","Description":"Advance payment Apr","Debit":21000000,"Credit":0},
+        {"Type":"General Journal","Account":"GST Payable","Account Type":"Other Current Liability","Trans #":4,"Date":"2024-03-31","Num":"","Description":"GST rounding adjustment","Debit":12,"Credit":0},
+    ])
+    sample_buf = io.StringIO()
+    sample_df.to_csv(sample_buf, index=False)
+    st.download_button(
+        "⬇ Download Sample ALL DATA CSV (Reckon Desktop format)",
+        sample_buf.getvalue(), "sample_reckon_desktop_all_data.csv", "text/csv"
+    )
+
+    # ── OUTPUT PREVIEW ──
+    st.markdown('<div class="sdiv">What the pipeline produces</div>', unsafe_allow_html=True)
+    st.markdown("""
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:#060f09;border:1px solid #14532d;border-radius:8px;padding:14px 16px;">
+        <div style="font-size:18px;margin-bottom:6px;">📄</div>
+        <div style="font-size:12px;font-weight:600;color:#4ade80;margin-bottom:4px;">account_mappings.csv</div>
+        <div style="font-size:11px;color:#2a4a2a;line-height:1.6;">Every account's mapped Reckon One target, confidence %, and status (approved / review / error)</div>
+      </div>
+      <div style="background:#080f1e;border:1px solid #1e3a5f;border-radius:8px;padding:14px 16px;">
+        <div style="font-size:18px;margin-bottom:6px;">🔍</div>
+        <div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:4px;">Anomaly Report</div>
+        <div style="font-size:11px;color:#1a2a4a;line-height:1.6;">Journal entry issues detected: duplicate refs, blank refs, GST rounding, cutoff violations — rated HIGH / MEDIUM / LOW</div>
+      </div>
+      <div style="background:#0c0c1a;border:1px solid #1e1e35;border-radius:8px;padding:14px 16px;">
+        <div style="font-size:18px;margin-bottom:6px;">⚖</div>
+        <div style="font-size:12px;font-weight:600;color:#818cf8;margin-bottom:4px;">Trial Balance Recon</div>
+        <div style="font-size:11px;color:#2a2a4a;line-height:1.6;">Source vs migrated balance comparison — PASSED / REVIEW / FAILED with variance root-cause analysis</div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ── RUN ──
     st.markdown('<div class="sdiv">Step 3 — Run the Pipeline</div>', unsafe_allow_html=True)
@@ -900,9 +1025,21 @@ elif page == "🔄 Entity Transform":
     else:
         records = SAMPLE_DATA.get(etype, [])
         if records:
-            st.markdown(callout("ℹ️", f"Using <strong>{len(records)} sample records</strong> — upload your CSV above to use your real data.", "info"), unsafe_allow_html=True)
+            sample_entity_df = pd.DataFrame(records)
+            sample_entity_buf = io.StringIO()
+            sample_entity_df.to_csv(sample_entity_buf, index=False)
+            c_prev, c_dl = st.columns([3,1])
+            with c_prev:
+                st.markdown(callout("ℹ️", f"Using <strong>{len(records)} sample records</strong> — apna CSV upload karein upar.", "info"), unsafe_allow_html=True)
+            with c_dl:
+                st.download_button(
+                    f"⬇ Sample {entity_type} CSV",
+                    sample_entity_buf.getvalue(),
+                    f"sample_{etype}.csv", "text/csv",
+                    help=f"Download this sample CSV and prepare your {entity_type} data in the same column format"
+                )
             with st.expander("Preview sample data"):
-                st.dataframe(pd.DataFrame(records), use_container_width=True, height=150)
+                st.dataframe(sample_entity_df, use_container_width=True, height=150)
         else:
             st.markdown(callout("ℹ️", "Upload a CSV to transform this entity type.", "info"), unsafe_allow_html=True)
             records = []
@@ -949,7 +1086,8 @@ elif page == "🔄 Entity Transform":
             df_out.to_csv(buf, index=False)
             st.download_button(f"⬇ Download {entity_type} CSV (Reckon One format)",
                                buf.getvalue(), f"reckon_one_{etype}.csv", "text/csv")
-            st.markdown(callout("✅", "This CSV is in <strong>Reckon One import format</strong>. Download and import directly.", "success"), unsafe_allow_html=True)
+            st.markdown(callout("✅", f"<strong>reckon_one_{etype}.csv</strong> — this file is ready to import into Reckon One. Download it and import directly.", "success"), unsafe_allow_html=True)
+            st.markdown(callout("💡", "<strong>How to import:</strong> Reckon One → Settings → Import Data → CSV Upload → select this file.", "info"), unsafe_allow_html=True)
 
         with t2:
             rules_rows = []
@@ -992,12 +1130,12 @@ elif page == "📊 Results":
         st.stop()
 
     instruction_box("How to read this page", [
-        "<strong>Account Mappings tab</strong> — every source account and its mapped Reckon One target with confidence score.",
-        "<strong>Anomalies tab</strong> — issues found in journal entries. Fix HIGH severity issues before importing.",
-        "<strong>Trial Balance tab</strong> — source vs migrated TB comparison. PASSED = ready to import.",
-        "Use the <strong>filter dropdowns</strong> to focus on specific statuses or severities.",
-        "Download buttons let you export each section as CSV for your records.",
-    ])
+        "<strong>Account Mappings tab</strong> — every source account with its Reckon One target and confidence score. Download as <strong>account_mappings.csv</strong>.",
+        "<strong>Anomalies tab</strong> — issues found in journal entries. Fix all <strong>HIGH severity</strong> items before importing to Reckon One.",
+        "<strong>Trial Balance tab</strong> — source vs migrated balance comparison. <strong>PASSED</strong> = ready to import.",
+        "Use the filter dropdowns to focus on specific statuses or severity levels.",
+        "Each tab has a <strong>Download CSV</strong> button — export any section for your records.",
+    ], tip="Start with Anomalies. Fix all HIGH severity issues first, then download Account Mappings, then import into Reckon One.")
 
     final = st.session_state["last_results"]
     maps  = final.get("mappings",  [])
