@@ -4,7 +4,7 @@ import asyncio
 import json
 import time
 from groq         import Groq
-from groq         import RateLimitError
+from groq         import RateLimitError, APIConnectionError, AuthenticationError
 from config       import GROQ_API_KEY, MODEL_PRIMARY, MODEL_VALIDATE, HITL_THRESHOLD, AUTO_THRESHOLD
 from memory       import (lookup_mapping, save_mapping,
                            save_anomaly_pattern, get_learned_patterns)
@@ -46,6 +46,9 @@ def _normalize_account(acc: dict) -> dict:
 
 
 def _call(model: str, system: str, user: str, max_tokens: int = 800) -> dict | list:
+    if not GROQ_API_KEY:
+        return {}
+    resp = None
     for attempt in range(4):
         try:
             resp = client.chat.completions.create(
@@ -60,8 +63,14 @@ def _call(model: str, system: str, user: str, max_tokens: int = 800) -> dict | l
             break
         except RateLimitError:
             if attempt == 3:
-                raise
+                return {}
             time.sleep(20 * (attempt + 1))
+        except (APIConnectionError, AuthenticationError):
+            return {}
+        except Exception:
+            return {}
+    if resp is None:
+        return {}
     raw = resp.choices[0].message.content.strip()
     if "```" in raw:
         raw = raw.split("```")[1]
@@ -196,6 +205,25 @@ Return JSON:
             primary_task   = loop.run_in_executor(None, _call, MODEL_PRIMARY,  system_prompt, user_prompt, 400)
             validator_task = loop.run_in_executor(None, _call, MODEL_VALIDATE, system_prompt, user_prompt, 300)
             primary, validator = await asyncio.gather(primary_task, validator_task)
+
+        # Both models returned empty — LLM API unavailable or key missing
+        if not primary and not validator:
+            entry = {
+                "source_code":  code,
+                "source_name":  name,
+                "target_code":  None,
+                "target_name":  None,
+                "confidence":   0,
+                "reasoning":    "LLM API unavailable — check API key in Streamlit secrets.",
+                "models_agree": False,
+                "source":       "llm",
+                "status":       "error",
+                "_reckon_type": reckon_type,
+                "_rules":       rules_info,
+            }
+            hitl_q.append({"type": "mapping", "account": acc, "ai_result": entry})
+            results.append(entry)
+            return
 
         agree    = (primary.get("target_code") == validator.get("target_code"))
         avg_conf = (int(primary.get("confidence", 0)) + int(validator.get("confidence", 0))) // 2

@@ -428,6 +428,14 @@ with st.sidebar:
     config.AUTO_THRESHOLD = auto_thresh
     config.CUTOFF_DATE    = str(cutoff_date)
 
+    # ── API key status indicator ──
+    st.markdown('<div style="border-top:1px solid #1a1a28;margin:16px 0 10px;"></div>', unsafe_allow_html=True)
+    _api_key_set = bool(config.GROQ_API_KEY)
+    if _api_key_set:
+        st.markdown('<div style="font-size:10px;color:#4ade80;">✓ API key configured</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div style="font-size:10px;color:#f87171;">✗ API key not set — rules &amp; memory only</div>', unsafe_allow_html=True)
+
     st.markdown('<div style="border-top:1px solid #1a1a28;margin:16px 0;"></div>', unsafe_allow_html=True)
     st.markdown('<div style="font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#333348;margin-bottom:10px;">🗂 Navigation</div>', unsafe_allow_html=True)
 
@@ -615,6 +623,16 @@ elif page == "🚀 Run Pipeline":
         "Click <strong>▶ Run Pipeline</strong> and watch the live progress log — each stage is tracked in real time.",
         "After completion, go to <strong>📊 Results</strong> to review mappings, the anomaly report, and reconciliation — then <strong>download CSVs</strong>.",
     ], tip="First time? Just click Run Pipeline without uploading anything — the system will use sample Reckon Desktop data to demonstrate the full pipeline.")
+
+    # ── API key warning ──
+    import config as _cfg
+    if not _cfg.GROQ_API_KEY:
+        st.markdown(callout("⚠️",
+            "<strong>LLM API key not configured.</strong> "
+            "Accounts resolved by rules or memory will still work. "
+            "For LLM-based mapping, add <code>GROQ_API_KEY</code> in "
+            "<strong>Streamlit Cloud → App Settings → Secrets</strong>.",
+            "warn"), unsafe_allow_html=True)
 
     # Active Reckon rules preview
     with st.expander("📋 View active Reckon migration rules (applied before any AI call)", expanded=False):
